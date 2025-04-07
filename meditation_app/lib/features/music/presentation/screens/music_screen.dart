@@ -14,54 +14,61 @@ class MusicScreen extends StatefulWidget {
 }
 
 class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  
-  final List<String> _categories = ['All', 'Favorite', 'Sleep', 'Insomnia', 'Anxiety'];
+  String _selectedFilter = 'All';
+  final List<String> _filters = ['All', 'Favorite', 'Sleep', 'Insomnia', 'Anxiety'];
   
   final List<MusicItem> _musicItems = [
     MusicItem(
       title: 'Focus Attention',
       subtitle: '7 DAYS OF CALM',
       duration: const Duration(minutes: 45),
-      color: const Color(0xFFDFE9F3),
+      gradient: const LinearGradient(
+        colors: [Color(0xFF67548B), Color(0xFFD3C265)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
     ),
     MusicItem(
       title: 'Mindful Meditation',
       subtitle: 'STRESS RELIEF',
       duration: const Duration(minutes: 32, seconds: 10),
-      color: const Color(0xFFF8DFD6),
+      gradient: const LinearGradient(
+        colors: [Color(0xFFFF7C6B), Color(0xFFFAC978)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
     ),
     MusicItem(
       title: 'Ocean Waves',
       subtitle: 'AMBIENT SOUND',
       duration: const Duration(minutes: 60),
-      color: const Color(0xFFD1ECD1),
+      gradient: const LinearGradient(
+        colors: [Color(0xFF3F414E), Color(0xFF8BADD2)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
     ),
     MusicItem(
       title: 'Delta Waves',
       subtitle: 'SLEEP SOUND',
       duration: const Duration(minutes: 240),
-      color: const Color(0xFFE5D9F2),
+      gradient: const LinearGradient(
+        colors: [Color(0xFFA0A3B1), Color(0xFFFFDEA7)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
     ),
     MusicItem(
       title: 'Morning Energy',
       subtitle: 'DAILY BOOST',
       duration: const Duration(minutes: 15, seconds: 30),
-      color: const Color(0xFFFFF2C5),
+      gradient: const LinearGradient(
+        colors: [Color(0xFF67548B), Color(0xFFEDC59F)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
     ),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: _categories.length, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +79,7 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
           children: [
             _buildHeader(),
             const SizedBox(height: 20),
-            _buildTabBar(),
+            _buildFilterTabs(),
             const SizedBox(height: 30),
             Expanded(
               child: SingleChildScrollView(
@@ -129,33 +136,47 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
     );
   }
 
-  Widget _buildTabBar() {
-    return Container(
+  Widget _buildFilterTabs() {
+    return SizedBox(
       height: 50,
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F9),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(25),
-          color: AppColors.primary,
-        ),
-        labelColor: Colors.white,
-        unselectedLabelColor: const Color(0xFFA0A3B1),
-        labelStyle: const TextStyle(
-          fontFamily: 'HelveticaNeue',
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontFamily: 'HelveticaNeue',
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-        ),
-        tabs: _categories.map((category) => Tab(text: category)).toList(),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        itemCount: _filters.length,
+        itemBuilder: (context, index) {
+          final filter = _filters[index];
+          final isSelected = filter == _selectedFilter;
+          
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedFilter = filter;
+              });
+            },
+            child: Container(
+              margin: const EdgeInsets.only(right: 15),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.primary : Colors.transparent,
+                borderRadius: BorderRadius.circular(25),
+                border: Border.all(
+                  color: isSelected ? Colors.transparent : const Color(0xFFA0A3B1),
+                  width: 1,
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  filter,
+                  style: TextStyle(
+                    fontFamily: 'HelveticaNeue',
+                    fontSize: 16,
+                    color: isSelected ? Colors.white : const Color(0xFFA0A3B1),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -174,12 +195,109 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
           ),
         ),
         const SizedBox(height: 20),
-        _buildMusicCard(
-          title: 'Nature Symphony',
-          subtitle: 'STRESS RELIEF',
-          duration: const Duration(minutes: 50),
-          color: const Color(0xFFD7F2E4),
-          isHighlighted: true,
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MusicPlayerScreen(
+                  title: 'Nature Symphony',
+                  subtitle: 'STRESS RELIEF',
+                  totalDuration: Duration(minutes: 50),
+                ),
+              ),
+            );
+          },
+          child: Container(
+            height: 180,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF8E97FD), Color(0xFFD7F2E4)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Nature Symphony',
+                            style: TextStyle(
+                              fontFamily: 'HelveticaNeue',
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            'STRESS RELIEF',
+                            style: TextStyle(
+                              fontFamily: 'HelveticaNeue',
+                              fontSize: 12,
+                              letterSpacing: 0.7,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        height: 40,
+                        width: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.play_arrow,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              '50:00',
+                              style: TextStyle(
+                                fontFamily: 'HelveticaNeue',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.music_note,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
@@ -199,18 +317,23 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
           ),
         ),
         const SizedBox(height: 20),
-        ListView.separated(
+        GridView.builder(
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+            childAspectRatio: 0.8,
+          ),
           itemCount: _musicItems.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 15),
           itemBuilder: (context, index) {
             final item = _musicItems[index];
-            return _buildMusicListItem(
+            return _buildMusicCard(
               title: item.title,
               subtitle: item.subtitle,
               duration: item.duration,
-              color: item.color,
+              gradient: item.gradient,
             );
           },
         ),
@@ -222,8 +345,7 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
     required String title,
     required String subtitle,
     required Duration duration,
-    required Color color,
-    bool isHighlighted = false,
+    required LinearGradient gradient,
   }) {
     return GestureDetector(
       onTap: () {
@@ -239,169 +361,80 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
         );
       },
       child: Container(
-        height: 180,
-        width: double.infinity,
         decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(15),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontFamily: 'HelveticaNeue',
-                          fontSize: 24,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF3F414E),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          fontFamily: 'HelveticaNeue',
-                          fontSize: 12,
-                          letterSpacing: 0.7,
-                          color: Color(0xFF5A6175),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    height: 40,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF3F414E).withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.play_arrow,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          _formatDuration(duration),
-                          style: const TextStyle(
-                            fontFamily: 'HelveticaNeue',
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.music_note,
-                size: 50,
-                color: const Color(0xFF3F414E).withOpacity(0.8),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMusicListItem({
-    required String title,
-    required String subtitle,
-    required Duration duration,
-    required Color color,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MusicPlayerScreen(
-              title: title,
-              subtitle: subtitle,
-              totalDuration: duration,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        height: 80,
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.6),
+          gradient: gradient,
           borderRadius: BorderRadius.circular(10),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(
+        child: Stack(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFF3F414E).withOpacity(0.8),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.play_arrow,
-                color: Colors.white,
-                size: 24,
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 90,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.0),
+                      Colors.black.withOpacity(0.2),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(width: 20),
-            Expanded(
+            Padding(
+              padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
                     title,
                     style: const TextStyle(
                       fontFamily: 'HelveticaNeue',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF3F414E),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 6),
                   Text(
                     subtitle,
                     style: const TextStyle(
                       fontFamily: 'HelveticaNeue',
-                      fontSize: 12,
+                      fontSize: 11,
                       letterSpacing: 0.7,
-                      color: Color(0xFF5A6175),
+                      color: Colors.white,
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _formatDuration(duration),
+                          style: const TextStyle(
+                            fontFamily: 'HelveticaNeue',
+                            fontSize: 12,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
-              ),
-            ),
-            Text(
-              _formatDuration(duration),
-              style: const TextStyle(
-                fontFamily: 'HelveticaNeue',
-                fontSize: 14,
-                color: Color(0xFF5A6175),
               ),
             ),
           ],
@@ -501,12 +534,12 @@ class MusicItem {
   final String title;
   final String subtitle;
   final Duration duration;
-  final Color color;
+  final LinearGradient gradient;
 
   MusicItem({
     required this.title,
     required this.subtitle,
     required this.duration,
-    required this.color,
+    required this.gradient,
   });
 } 
