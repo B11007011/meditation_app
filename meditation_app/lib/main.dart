@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Set this to true to start directly at the Home screen for debugging
-    const bool startAtHomeScreen = false;
+    const bool startAtHomeScreen = true;
 
     return MaterialApp(
       title: 'Silent Moon',
