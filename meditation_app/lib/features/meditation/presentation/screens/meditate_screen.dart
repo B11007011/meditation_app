@@ -4,6 +4,7 @@ import 'package:meditation_app/features/meditation/presentation/screens/meditati
 import 'package:meditation_app/features/home/presentation/screens/home_screen.dart';
 import 'package:meditation_app/features/music/presentation/screens/music_screen.dart';
 import 'package:meditation_app/features/sleep/presentation/screens/sleep_screen.dart';
+import 'package:meditation_app/features/profile/presentation/screens/profile_screen.dart';
 
 class MeditateScreen extends StatefulWidget {
   const MeditateScreen({super.key});
@@ -403,7 +404,12 @@ class _MeditateScreenState extends State<MeditateScreen> {
               MaterialPageRoute(builder: (context) => const MusicScreen()),
             );
           }),
-          _buildNavItem(Icons.person_outline, 'Profile', false, onTap: () {}),
+          _buildNavItem(Icons.person_outline, 'Profile', false, onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          }),
         ],
       ),
     );

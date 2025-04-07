@@ -4,6 +4,7 @@ import 'package:meditation_app/features/meditation/presentation/screens/meditati
 import 'package:meditation_app/features/meditation/presentation/screens/meditate_screen.dart';
 import 'package:meditation_app/features/music/presentation/screens/music_screen.dart';
 import 'package:meditation_app/features/sleep/presentation/screens/sleep_screen.dart';
+import 'package:meditation_app/features/profile/presentation/screens/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userName;
@@ -405,7 +406,12 @@ class HomeScreen extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const MusicScreen()),
             );
           }),
-          _buildNavItem(Icons.person_outline, 'Profile', false, onTap: () {}),
+          _buildNavItem(Icons.person_outline, 'Profile', false, onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ProfileScreen()),
+            );
+          }),
         ],
       ),
     );

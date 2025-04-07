@@ -22,6 +22,8 @@ A beautiful Flutter meditation app with a smooth onboarding flow and sleek user 
    - Music Player Screen - Play and control meditation sounds
    - Sleep Screen - Browse sleep stories and sounds
    - Sleep Player Screen - Play sleep stories with themed UI
+   - Profile Screen - User profile management and settings
+   - Edit Profile Screen - Update user profile information
 
 ## Features
 
@@ -36,6 +38,9 @@ A beautiful Flutter meditation app with a smooth onboarding flow and sleek user 
 - Music player with playback controls and volume adjustment
 - Sleep stories collection with grid view display
 - Sleep player with themed background and controls
+- User profile with meditation statistics and streak tracking
+- Premium membership management
+- User settings and preferences
 
 ## Getting Started
 

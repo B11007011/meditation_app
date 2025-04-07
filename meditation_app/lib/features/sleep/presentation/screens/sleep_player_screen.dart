@@ -162,10 +162,17 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
                 color: const Color(0xFF03174C).withOpacity(0.3),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-                size: 24,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SvgPicture.asset(
+                  'assets/images/sleep/back_button.svg',
+                  width: 24,
+                  height: 24,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFFE6E7F2),
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
             ),
           ),
