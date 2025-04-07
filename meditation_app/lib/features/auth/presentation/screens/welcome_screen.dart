@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signin_screen.dart';
+import 'package:meditation_app/features/meditation/presentation/screens/choose_topic_screen.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 
 class WelcomeScreen extends StatelessWidget {
@@ -142,7 +143,7 @@ class WelcomeScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SignInScreen(),
+                            builder: (context) => const ChooseTopicScreen(),
                           ),
                         );
                       },

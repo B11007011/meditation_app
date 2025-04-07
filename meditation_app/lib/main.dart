@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signup_signin_screen.dart';
+import 'package:meditation_app/features/home/presentation/screens/home_screen.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 
 void main() {
@@ -11,6 +12,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Set this to true to start directly at the Home screen for debugging
+    const bool startAtHomeScreen = false;
+
     return MaterialApp(
       title: 'Silent Moon',
       debugShowCheckedModeBanner: false,
@@ -20,7 +24,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.background,
         fontFamily: 'HelveticaNeue',
       ),
-      home: const SignUpScreen(),
+      home: startAtHomeScreen ? const HomeScreen() : const SignUpScreen(),
     );
   }
 }

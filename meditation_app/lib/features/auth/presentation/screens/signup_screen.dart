@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signin_screen.dart';
 import 'package:meditation_app/features/auth/presentation/screens/welcome_screen.dart';
+import 'package:meditation_app/features/meditation/presentation/screens/choose_topic_screen.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 
 class CreateAccountScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => WelcomeScreen(userName: _nameController.text),
+          builder: (context) => const ChooseTopicScreen(),
         ),
       );
     }
