@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "718755695095",
+    "project_id": "trader-35173",
+    "storage_bucket": "trader-35173.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718755695095:android:ccfe9b254ce69d633506f2",
+        "android_client_info": {
+          "package_name": "com.trader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "718755695095-3v8trnn5mb4nkt14727mmim35canq1c1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6XqGhXEB6ZTKsh4tNEvE_mtlg56P5JMc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "718755695095-3v8trnn5mb4nkt14727mmim35canq1c1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "718755695095-5d1rfr5d9m8gun9dotp3c6k108mjt8sn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.trader"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

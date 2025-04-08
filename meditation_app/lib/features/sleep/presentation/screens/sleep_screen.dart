@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:meditation_app/shared/theme/app_theme.dart';
 import 'package:meditation_app/features/home/presentation/screens/home_screen.dart';
 import 'package:meditation_app/features/sleep/presentation/screens/sleep_player_screen.dart';
 import 'package:meditation_app/features/music/presentation/screens/music_screen.dart';
@@ -15,33 +14,33 @@ class SleepScreen extends StatefulWidget {
 }
 
 class _SleepScreenState extends State<SleepScreen> {
-  final List<SleepMusicItem> _sleepMusicItems = [
-    SleepMusicItem(
+  static const List<SleepMusicItem> _sleepMusicItems = [
+    const SleepMusicItem(
       title: 'Night Island',
       duration: '45 MIN',
       type: 'SLEEP MUSIC',
     ),
-    SleepMusicItem(
+    const SleepMusicItem(
       title: 'Sweet Sleep',
       duration: '45 MIN',
       type: 'SLEEP MUSIC',
     ),
-    SleepMusicItem(
+    const SleepMusicItem(
       title: 'Good Night',
       duration: '45 MIN',
       type: 'SLEEP MUSIC',
     ),
-    SleepMusicItem(
+    const SleepMusicItem(
       title: 'Moon Clouds',
       duration: '45 MIN',
       type: 'SLEEP MUSIC',
     ),
-    SleepMusicItem(
+    const SleepMusicItem(
       title: 'Night Island',
       duration: '45 MIN',
       type: 'SLEEP MUSIC',
     ),
-    SleepMusicItem(
+    const SleepMusicItem(
       title: 'Sweet Sleep',
       duration: '45 MIN',
       type: 'SLEEP MUSIC',
@@ -51,20 +50,15 @@ class _SleepScreenState extends State<SleepScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF03174C), // Dark blue background from Figma
+      backgroundColor: const Color(0xFF03174C),
       body: Column(
         children: [
-          // Header with back button
           _buildHeader(),
-          
-          // Horizontal line
           Container(
             height: 1,
             color: const Color(0xFFE6E6E6).withOpacity(0.1),
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
-
-          // Music items grid
           Expanded(
             child: _buildMusicGrid(),
           ),
@@ -79,7 +73,6 @@ class _SleepScreenState extends State<SleepScreen> {
       padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
       child: Row(
         children: [
-          // Back button
           GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -102,7 +95,6 @@ class _SleepScreenState extends State<SleepScreen> {
             ),
           ),
           const Spacer(),
-          // Sleep Music title
           const Text(
             'Sleep Music',
             style: TextStyle(
@@ -113,7 +105,6 @@ class _SleepScreenState extends State<SleepScreen> {
             ),
           ),
           const Spacer(),
-          // Empty space to balance the layout
           const SizedBox(width: 44),
         ],
       ),
@@ -160,7 +151,6 @@ class _SleepScreenState extends State<SleepScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Item content
             Expanded(
               child: Center(
                 child: SvgPicture.asset(
@@ -174,14 +164,11 @@ class _SleepScreenState extends State<SleepScreen> {
                 ),
               ),
             ),
-            
-            // Item details at bottom
             Container(
               padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Duration and type
                   Row(
                     children: [
                       Text(
@@ -216,7 +203,6 @@ class _SleepScreenState extends State<SleepScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // Title
                   Text(
                     item.title,
                     style: const TextStyle(
@@ -307,10 +293,9 @@ class _SleepScreenState extends State<SleepScreen> {
   }
 
   Widget _buildNavItem(String iconPath, String label, bool isSelected, {required VoidCallback onTap}) {
-    // Colors from the Figma design
-    final Color activeColor = const Color(0xFFE6E7F2); // white
-    final Color inactiveColor = const Color(0xFF98A1BD); // light purple
-    final Color activeBackgroundColor = const Color(0xFF8E97FD); // purple
+    final Color activeColor = const Color(0xFFE6E7F2);
+    final Color inactiveColor = const Color(0xFF98A1BD);
+    final Color activeBackgroundColor = const Color(0xFF8E97FD);
 
     return GestureDetector(
       onTap: onTap,
@@ -365,9 +350,9 @@ class SleepMusicItem {
   final String duration;
   final String type;
 
-  SleepMusicItem({
+  const SleepMusicItem({
     required this.title,
     required this.duration,
     required this.type,
   });
-} 
+}
