@@ -12,10 +12,17 @@ class SignInScreen extends StatefulWidget {
   State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignInScreenState extends State<SignInScreen> with WidgetsBindingObserver {
   bool _isLoading = false;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // Handle background state
+    }
+  }
 
   @override
   void dispose() {
@@ -55,6 +62,43 @@ class _SignInScreenState extends State<SignInScreen> {
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _signInWithEmailAndPassword() async {
+    try {
+      final UserCredential userCredential = 
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+      if (userCredential.user != null && mounted) {
+        // Add delay to allow proper widget disposal
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (!mounted) return;
+        
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } on FirebaseAuthException catch (e) {
+      // Improved error handling
+      String errorMessage = 'Sign-in failed. Please try again.';
+      if (e.code == 'user-not-found') {
+        errorMessage = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        errorMessage = 'Wrong password provided.';
+      }
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An unexpected error occurred: $e')),
+        );
       }
     }
   }
@@ -274,10 +318,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
                         setState(() => _isLoading = true);
                         try {
-                          await FirebaseAuth.instance.signInWithEmailAndPassword(
-                            email: email,
-                            password: password,
-                          );
+                          await _signInWithEmailAndPassword();
                           if (mounted) {
                             Navigator.pushReplacement(
                               context,

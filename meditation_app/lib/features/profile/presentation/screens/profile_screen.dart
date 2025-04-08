@@ -20,33 +20,53 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
+  void initState() {
+    super.initState();
+    // Add delayed initialization to ensure provider mounted
+    Future.microtask(() {
+      if (mounted) {
+        // Profile is now auto-initialized by ProfileProvider
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ProfileProvider(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Consumer<ProfileProvider>(
-            builder: (context, profileProvider, _) {
-              final UserProfile userProfile = profileProvider.userProfile;
-              
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-                    _buildProfileCard(userProfile),
-                    _buildStatisticsSection(userProfile),
-                    _buildMembershipSection(userProfile),
-                    _buildSettingsSection(),
-                  ],
-                ),
-              );
-            },
+    return Consumer<ProfileProvider>(
+      builder: (context, provider, child) {
+        // Add error boundary
+        if (provider.userProfile.id == 'unknown') {
+          return const Center(child: Text('User not authenticated'));
+        }
+        // Rest of profile UI
+        return ChangeNotifierProvider(
+          create: (_) => ProfileProvider(),
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Consumer<ProfileProvider>(
+                builder: (context, profileProvider, _) {
+                  final UserProfile userProfile = profileProvider.userProfile;
+                  
+                  return SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHeader(),
+                        _buildProfileCard(userProfile),
+                        _buildStatisticsSection(userProfile),
+                        _buildMembershipSection(userProfile),
+                        _buildSettingsSection(),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+            bottomNavigationBar: _buildBottomNavigationBar(),
           ),
-        ),
-        bottomNavigationBar: _buildBottomNavigationBar(),
-      ),
+        );
+      },
     );
   }
 
