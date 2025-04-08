@@ -19,8 +19,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    // For demo purposes, we'll wrap the screen in a provider
-    // In a real app, you would have this at the app level
     return ChangeNotifierProvider(
       create: (_) => ProfileProvider(),
       child: Scaffold(
@@ -75,7 +73,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       child: Row(
         children: [
-          // Profile image
           Container(
             width: 80,
             height: 80,
@@ -275,72 +272,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: profile.isPremium 
-                      ? const Color(0xFFFFDB9D) 
-                      : Colors.white.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(20),
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: Text(
-                  profile.isPremium ? 'Premium' : 'Free',
+                child: const Text(
+                  'PRO',
                   style: TextStyle(
                     fontFamily: 'HelveticaNeue',
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: profile.isPremium 
-                        ? const Color(0xFF3F414E) 
-                        : Colors.white,
+                    color: Colors.white,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 15),
-          Text(
-            profile.isPremium 
-                ? 'You have unlimited access to all meditation content and features.'
-                : 'Upgrade to premium for unlimited access to all meditation content and features.',
-            style: const TextStyle(
+          const SizedBox(height: 10),
+          const Text(
+            'Unlock all features and content',
+            style: TextStyle(
               fontFamily: 'HelveticaNeue',
               fontSize: 14,
               color: Colors.white,
             ),
           ),
-          const SizedBox(height: 15),
-          if (!profile.isPremium)
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle premium upgrade
-                  Provider.of<ProfileProvider>(context, listen: false).togglePremium();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: const Text(
-                  'UPGRADE TO PREMIUM',
-                  style: TextStyle(
-                    fontFamily: 'HelveticaNeue',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
-                    letterSpacing: 0.5,
-                  ),
-                ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              // TODO: Implement membership upgrade
+            },
+            style: ElevatedButton.styleFrom(
+              foregroundColor: const Color(0xFF8E97FD),
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: const Text(
+              'Upgrade Now',
+              style: TextStyle(
+                fontFamily: 'HelveticaNeue',
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF8E97FD),
               ),
             ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingsSection() {
+    Widget _buildSettingsSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
@@ -356,76 +342,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 15),
-          _buildSettingItem(
-            icon: Icons.notifications_none,
+          _buildSettingsItem(
+            icon: Icons.notifications_outlined,
             title: 'Notifications',
-            onTap: () {},
+            onTap: () {
+              // TODO: Implement notifications settings
+            },
           ),
-          _buildSettingItem(
-            icon: Icons.music_note_outlined,
-            title: 'Sound',
-            onTap: () {},
-          ),
-          _buildSettingItem(
-            icon: Icons.security_outlined,
+          _buildSettingsItem(
+            icon: Icons.lock_outline,
             title: 'Privacy',
-            onTap: () {},
+            onTap: () {
+              // TODO: Implement privacy settings
+            },
           ),
-          _buildSettingItem(
+          _buildSettingsItem(
             icon: Icons.help_outline,
             title: 'Help & Support',
-            onTap: () {},
+            onTap: () {
+              // TODO: Implement help & support
+            },
           ),
-          _buildSettingItem(
+          _buildSettingsItem(
+            icon: Icons.info_outline,
+            title: 'About',
+            onTap: () {
+              // TODO: Implement about
+            },
+          ),
+          _buildSettingsItem(
             icon: Icons.logout,
-            title: 'Sign Out',
-            isDestructive: true,
-            onTap: () {},
+            title: 'Logout',
+            onTap: () {
+              // TODO: Implement logout
+            },
           ),
-          const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  Widget _buildSettingItem({
+  Widget _buildSettingsItem({
     required IconData icon,
     required String title,
-    bool isDestructive = false,
     required VoidCallback onTap,
   }) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      child: Padding(
+      child: Container(
         padding: const EdgeInsets.symmetric(vertical: 15),
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Color(0xFFF2F2F7),
+              width: 1,
+            ),
+          ),
+        ),
         child: Row(
           children: [
             Icon(
               icon,
+              color: const Color(0xFF3F414E),
               size: 24,
-              color: isDestructive 
-                  ? const Color(0xFFFF5E7A) 
-                  : const Color(0xFF3F414E),
             ),
             const SizedBox(width: 15),
             Text(
               title,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'HelveticaNeue',
                 fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isDestructive 
-                    ? const Color(0xFFFF5E7A) 
-                    : const Color(0xFF3F414E),
+                color: Color(0xFF3F414E),
               ),
             ),
             const Spacer(),
-            if (!isDestructive)
-              const Icon(
-                Icons.arrow_forward_ios,
-                size: 16,
-                color: Color(0xFFA1A4B2),
-              ),
+            const Icon(
+              Icons.chevron_right,
+              color: Color(0xFFA1A4B2),
+              size: 24,
+            ),
           ],
         ),
       ),
@@ -449,25 +444,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildNavItem(Icons.home, 'Home', false, onTap: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           }),
           _buildNavItem(Icons.bedtime, 'Sleep', false, onTap: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const SleepScreen()),
             );
           }),
           _buildNavItem(Icons.favorite_border, 'Meditate', false, onTap: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const MeditateScreen()),
             );
           }),
           _buildNavItem(Icons.music_note, 'Music', false, onTap: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const MusicScreen()),
             );
@@ -503,4 +498,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
-} 
+}

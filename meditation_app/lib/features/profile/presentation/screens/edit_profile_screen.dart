@@ -41,9 +41,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       
       // Update the profile
       final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-      final updatedProfile = profileProvider.userProfile.copyWith(
+      final updatedProfile = UserProfile(
         name: _nameController.text,
         email: _emailController.text,
+        isPremium: profileProvider.userProfile.isPremium,
       );
       
       // Simulate network delay
