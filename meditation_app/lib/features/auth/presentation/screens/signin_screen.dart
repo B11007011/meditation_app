@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signup_signin_screen.dart';
-import 'package:meditation_app/features/meditation/presentation/screens/choose_topic_screen.dart';
 import 'package:meditation_app/features/home/presentation/screens/home_screen.dart';
 
 class SignInScreen extends StatelessWidget {
@@ -252,4 +251,4 @@ class SignInScreen extends StatelessWidget {
       ),
     );
   }
-} 
+}

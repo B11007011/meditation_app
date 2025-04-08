@@ -98,7 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  profile.name,
+                  profile.name ?? 'No name',
                   style: const TextStyle(
                     fontFamily: 'HelveticaNeue',
                     fontSize: 20,
@@ -108,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  profile.email,
+                  profile.email ?? 'No email',
                   style: const TextStyle(
                     fontFamily: 'HelveticaNeue',
                     fontSize: 14,
@@ -171,7 +171,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: _buildStatCard(
                   icon: Icons.access_time,
-                  title: '${profile.meditationMinutes}',
+                  title: '${profile.totalMeditationTime.inMinutes}',
                   subtitle: 'Minutes',
                   color: const Color(0xFFFFCF86),
                 ),
@@ -180,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: _buildStatCard(
                   icon: Icons.favorite,
-                  title: '${profile.sessionsCompleted}',
+                  title: '${profile.totalSessions}',
                   subtitle: 'Sessions',
                   color: const Color(0xFFB5C8FF),
                 ),
@@ -189,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: _buildStatCard(
                   icon: Icons.local_fire_department,
-                  title: '${profile.currentStreak}',
+                  title: '${profile.lastMeditationDate != null ? (DateTime.now().difference(profile.lastMeditationDate!).inDays == 0 ? 1 : 0) : 0}',
                   subtitle: 'Day Streak',
                   color: const Color(0xFFAFDBC5),
                 ),

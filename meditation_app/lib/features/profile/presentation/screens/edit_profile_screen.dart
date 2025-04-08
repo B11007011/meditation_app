@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
@@ -24,7 +25,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final profile = Provider.of<ProfileProvider>(context, listen: false).userProfile;
       _nameController.text = profile.name;
-      _emailController.text = profile.email;
+      _emailController.text = profile.email ?? '';
     });
   }
 
@@ -41,10 +42,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       
       // Update the profile
       final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-      final updatedProfile = UserProfile(
+      final currentProfile = profileProvider.userProfile;
+      final updatedProfile = currentProfile.copyWith(
         name: _nameController.text,
         email: _emailController.text,
-        isPremium: profileProvider.userProfile.isPremium,
       );
       
       // Simulate network delay

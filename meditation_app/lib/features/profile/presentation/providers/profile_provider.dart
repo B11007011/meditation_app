@@ -10,13 +10,11 @@ class ProfileProvider with ChangeNotifier {
   // Create mock profile for demo
   UserProfile _createDemoProfile() {
     return UserProfile(
+      id: 'demo-user',
       name: 'Afsar Hossen',
       email: 'afsar@example.com',
-      meditationMinutes: 120,
-      sessionsCompleted: 12,
-      longestStreak: 7,
-      currentStreak: 3,
-      isPremium: false,
+      totalSessions: 12,
+      totalMeditationTime: Duration(minutes: 120),
     );
   }
 
@@ -38,31 +36,13 @@ class ProfileProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Toggle premium status
-  void togglePremium() {
-    _userProfile = userProfile.copyWith(isPremium: !userProfile.isPremium);
-    notifyListeners();
-  }
-
   // Log meditation session
-  void logMeditationSession(int minutes) {
+  void logMeditationSession(Duration duration) {
     _userProfile = userProfile.copyWith(
-      meditationMinutes: userProfile.meditationMinutes + minutes,
-      sessionsCompleted: userProfile.sessionsCompleted + 1,
+      totalSessions: userProfile.totalSessions + 1,
+      totalMeditationTime: userProfile.totalMeditationTime + duration,
+      lastMeditationDate: DateTime.now(),
     );
     notifyListeners();
   }
-
-  // Update streak
-  void updateStreak(int newStreak) {
-    final longestStreak = newStreak > userProfile.longestStreak 
-        ? newStreak 
-        : userProfile.longestStreak;
-    
-    _userProfile = userProfile.copyWith(
-      currentStreak: newStreak,
-      longestStreak: longestStreak,
-    );
-    notifyListeners();
-  }
-} 
+}
