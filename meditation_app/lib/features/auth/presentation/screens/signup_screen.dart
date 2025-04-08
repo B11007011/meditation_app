@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signin_screen.dart';
 import 'package:meditation_app/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:meditation_app/features/meditation/presentation/screens/choose_topic_screen.dart';
@@ -19,6 +21,41 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _passwordController = TextEditingController();
   bool _isPrivacyPolicyAccepted = false;
   bool _isLoading = false;
+
+  Future<UserCredential?> signInWithGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        return null;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = 
+          await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      debugPrint('Google sign in error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign in with Google: ${e.toString()}')),
+      );
+      return null;
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -125,7 +162,19 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       width: double.infinity,
                       height: 63,
                       child: OutlinedButton(
-                        onPressed: () {},
+                        onPressed: _isLoading 
+                            ? null
+                            : () async {
+                                final userCredential = await signInWithGoogle();
+                                if (userCredential != null && mounted) {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const ChooseTopicScreen(),
+                                    ),
+                                  );
+                                }
+                              },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFFEBEAEC)),
                           shape: RoundedRectangleBorder(

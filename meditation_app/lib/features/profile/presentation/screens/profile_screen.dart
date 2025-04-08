@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:meditation_app/features/auth/presentation/screens/signup_signin_screen.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 import 'package:meditation_app/features/profile/domain/models/user_profile.dart';
 import 'package:meditation_app/features/profile/presentation/providers/profile_provider.dart';
@@ -373,8 +375,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildSettingsItem(
             icon: Icons.logout,
             title: 'Logout',
-            onTap: () {
-              // TODO: Implement logout
+            onTap: () async {
+              try {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SignUpScreen(),
+                  ),
+                  (route) => false,
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Logout failed: ${e.toString()}')),
+                );
+              }
             },
           ),
         ],
