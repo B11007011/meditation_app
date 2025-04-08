@@ -1,21 +1,41 @@
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meditation_app/features/profile/domain/models/user_profile.dart';
 
 class ProfileProvider with ChangeNotifier {
   UserProfile? _userProfile;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Mock data for demo purposes
-  UserProfile get userProfile => _userProfile ?? _createDemoProfile();
+  ProfileProvider() {
+    _initUser();
+    _auth.authStateChanges().listen((user) => _initUser());
+  }
 
-  // Create mock profile for demo
-  UserProfile _createDemoProfile() {
-    return UserProfile(
-      id: 'demo-user',
-      name: 'Afsar Hossen',
-      email: 'afsar@example.com',
-      totalSessions: 12,
-      totalMeditationTime: Duration(minutes: 120),
+  UserProfile get userProfile {
+    if (_userProfile == null && _auth.currentUser != null) {
+      _initUser();
+    }
+    return _userProfile ?? UserProfile(
+      id: 'unknown',
+      name: 'Guest',
+      totalSessions: 0,
+      totalMeditationTime: Duration.zero,
     );
+  }
+
+  void _initUser() {
+    final user = _auth.currentUser;
+    if (user != null) {
+      _userProfile = UserProfile(
+        id: user.uid,
+        name: user.displayName ?? 'User',
+        email: user.email,
+        avatarUrl: user.photoURL,
+        totalSessions: 0,
+        totalMeditationTime: Duration.zero,
+      );
+      notifyListeners();
+    }
   }
 
   // Update user profile
