@@ -24,10 +24,10 @@ class SignUpScreen extends StatelessWidget {
                   children: [
                     Image.asset('assets/images/logo.png', height: 40),
                     const SizedBox(width: 10),
-                    // const Text(
-                    //   'Silent Moon',
-                    //   style: AppTextStyles.logo,
-                    // ),
+                    const Text(
+                      'Silent Moon',
+                      style: AppTextStyles.logo,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 40),

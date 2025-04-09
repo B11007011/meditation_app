@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meditation_app/features/profile/domain/models/user_profile.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class ProfileProvider with ChangeNotifier {
   UserProfile? _userProfile;
@@ -9,8 +10,10 @@ class ProfileProvider with ChangeNotifier {
   StreamSubscription<User?>? _authSubscription;
   bool _isInitialized = false;
   bool _mounted = true;
+  late Box<UserProfile> _profileBox;
 
   ProfileProvider() {
+    _initBox();
     _initUser();
     _authSubscription = _auth.authStateChanges().listen((user) {
       if (!_mounted) return;
@@ -21,6 +24,10 @@ class ProfileProvider with ChangeNotifier {
         if (_mounted) notifyListeners();
       }
     });
+  }
+
+  Future<void> _initBox() async {
+    _profileBox = Hive.box<UserProfile>('userProfiles');
   }
 
   UserProfile get userProfile {
@@ -41,14 +48,26 @@ class ProfileProvider with ChangeNotifier {
 
       final user = _auth.currentUser;
       if (user != null) {
-        _userProfile = UserProfile(
-          id: user.uid,
-          name: user.displayName ?? 'User',
-          email: user.email,
-          avatarUrl: user.photoURL,
-          totalSessions: 0,
-          totalMeditationTime: Duration.zero,
-        );
+        // Try to load from Hive first
+        final savedProfile = _profileBox.get(user.uid);
+        
+        if (savedProfile != null) {
+          _userProfile = savedProfile;
+        } else {
+          // Create new profile if not found in Hive
+          _userProfile = UserProfile(
+            id: user.uid,
+            name: user.displayName ?? 'User',
+            email: user.email,
+            avatarUrl: user.photoURL,
+            totalSessions: 0,
+            totalMeditationTime: Duration.zero,
+          );
+          
+          // Save to Hive
+          await _profileBox.put(user.uid, _userProfile!);
+        }
+        
         _isInitialized = true;
         if (_mounted) {
           notifyListeners();
@@ -62,31 +81,42 @@ class ProfileProvider with ChangeNotifier {
   }
 
   // Update user profile
-  void updateProfile(UserProfile updatedProfile) {
+  Future<void> updateProfile(UserProfile updatedProfile) async {
     _userProfile = updatedProfile;
+    await _saveProfile();
     notifyListeners();
   }
 
   // Update user name
-  void updateName(String name) {
+  Future<void> updateName(String name) async {
     _userProfile = userProfile.copyWith(name: name);
+    await _saveProfile();
     notifyListeners();
   }
 
   // Update email
-  void updateEmail(String email) {
+  Future<void> updateEmail(String email) async {
     _userProfile = userProfile.copyWith(email: email);
+    await _saveProfile();
     notifyListeners();
   }
 
   // Log meditation session
-  void logMeditationSession(Duration duration) {
+  Future<void> logMeditationSession(Duration duration) async {
     _userProfile = userProfile.copyWith(
       totalSessions: userProfile.totalSessions + 1,
       totalMeditationTime: userProfile.totalMeditationTime + duration,
       lastMeditationDate: DateTime.now(),
     );
+    await _saveProfile();
     notifyListeners();
+  }
+
+  // Save profile to Hive
+  Future<void> _saveProfile() async {
+    if (_userProfile != null && _userProfile!.id != 'unknown') {
+      await _profileBox.put(_userProfile!.id, _userProfile!);
+    }
   }
 
   @override

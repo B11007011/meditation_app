@@ -5,6 +5,9 @@ import 'package:meditation_app/features/home/presentation/screens/home_screen.da
 import 'package:meditation_app/features/music/presentation/screens/music_screen.dart';
 import 'package:meditation_app/features/sleep/presentation/screens/sleep_screen.dart';
 import 'package:meditation_app/features/profile/presentation/screens/profile_screen.dart';
+import 'package:meditation_app/features/meditation/domain/repositories/meditation_repository.dart';
+import 'package:meditation_app/features/meditation/domain/models/meditation.dart';
+import 'package:meditation_app/shared/services/analytics_service.dart';
 
 class MeditateScreen extends StatefulWidget {
   const MeditateScreen({super.key});
@@ -15,7 +18,58 @@ class MeditateScreen extends StatefulWidget {
 
 class _MeditateScreenState extends State<MeditateScreen> {
   String _selectedFilter = 'All';
-  final List<String> _filters = ['All', 'My', 'Sleep', 'Anxious', 'Kids'];
+  final List<String> _filters = ['All', 'My', 'Sleep', 'Anxious', 'Kids', 'Downloaded'];
+  final MeditationRepository _repository = MeditationRepository();
+  final AnalyticsService _analytics = AnalyticsService();
+  List<Meditation> _meditations = [];
+  List<Meditation> _filteredMeditations = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _analytics.logScreenView('meditate_screen');
+    _loadMeditations();
+  }
+
+  Future<void> _loadMeditations() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final meditations = _repository.getAllMeditations();
+      setState(() {
+        _meditations = meditations;
+        _filterMeditations();
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading meditations: $e')),
+        );
+      }
+    }
+  }
+
+  void _filterMeditations() {
+    if (_selectedFilter == 'All') {
+      _filteredMeditations = _meditations;
+    } else if (_selectedFilter == 'Downloaded') {
+      _filteredMeditations = _meditations.where((m) => m.isDownloaded).toList();
+    } else if (_selectedFilter == 'My') {
+      // In a real app, this would filter for user's saved meditations
+      _filteredMeditations = _meditations.take(3).toList();
+    } else {
+      _filteredMeditations = _meditations
+          .where((m) => m.category.toLowerCase() == _selectedFilter.toLowerCase())
+          .toList();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,34 +83,21 @@ class _MeditateScreenState extends State<MeditateScreen> {
             _buildFilterTabs(),
             const SizedBox(height: 30),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  children: [
-                    _buildDailyCalm(),
-                    const SizedBox(height: 20),
-                    _buildMeditationRow(),
-                    const SizedBox(height: 20),
-                    _buildMeditationRow(
-                      title1: 'Anxiet Release',
-                      description1: 'Ease anxiety with guided meditation',
-                      gradient1: const LinearGradient(
-                        colors: [Color(0xFFFF7C6B), Color(0xFFFAC978)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      title2: '7 Days of Calm',
-                      description2: 'Start your meditation journey',
-                      gradient2: const LinearGradient(
-                        colors: [Color(0xFF67548B), Color(0xFFEDC59F)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
-              ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _filteredMeditations.isEmpty
+                      ? _buildEmptyState()
+                      : SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              _buildDailyCalm(),
+                              const SizedBox(height: 20),
+                              _buildMeditationGrid(),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
+                        ),
             ),
           ],
         ),
@@ -115,6 +156,11 @@ class _MeditateScreenState extends State<MeditateScreen> {
             onTap: () {
               setState(() {
                 _selectedFilter = filter;
+                _filterMeditations();
+              });
+              
+              _analytics.logEvent('meditation_filter_changed', parameters: {
+                'filter': filter,
               });
             },
             child: Container(
@@ -146,18 +192,28 @@ class _MeditateScreenState extends State<MeditateScreen> {
   }
 
   Widget _buildDailyCalm() {
+    // Find the first meditation or use a default
+    final dailyMeditation = _meditations.isNotEmpty ? _meditations.first : null;
+    
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const MeditationDetailScreen(
-              title: 'Daily Calm',
-              description: 'Pause practice for mindfulness and peace',
-              duration: '10 MIN',
+        if (dailyMeditation != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MeditationDetailScreen(
+                title: dailyMeditation.title,
+                description: dailyMeditation.description,
+                duration: '${dailyMeditation.duration.inMinutes} MIN',
+                meditationId: dailyMeditation.id,
+              ),
             ),
-          ),
-        );
+          );
+          
+          _analytics.logEvent('daily_calm_selected', parameters: {
+            'meditation_id': dailyMeditation.id,
+          });
+        }
       },
       child: Container(
         height: 95,
@@ -205,9 +261,10 @@ class _MeditateScreenState extends State<MeditateScreen> {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Text(
-                            'APR 30',
-                            style: TextStyle(
+                          Text(
+                            DateTime.now().day.toString().padLeft(2, '0') + ' ' + 
+                            _getMonthAbbreviation(DateTime.now().month),
+                            style: const TextStyle(
                               fontFamily: 'HelveticaNeue',
                               fontSize: 11,
                               color: Color(0xFF5A6175),
@@ -259,80 +316,77 @@ class _MeditateScreenState extends State<MeditateScreen> {
     );
   }
 
-  Widget _buildMeditationRow({
-    String title1 = 'How to Meditate',
-    String description1 = 'Learn the basics of meditation',
-    LinearGradient gradient1 = const LinearGradient(
-      colors: [Color(0xFFA0A3B1), Color(0xFFFFDEA7)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
-    String title2 = 'Focus Attention',
-    String description2 = 'Learn to focus your attention',
-    LinearGradient gradient2 = const LinearGradient(
-      colors: [Color(0xFF67548B), Color(0xFFD3C265)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
-  }) {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildMeditationCard(
-            title: title1,
-            description: description1,
-            gradient: gradient1,
-          ),
-        ),
-        const SizedBox(width: 20),
-        Expanded(
-          child: _buildMeditationCard(
-            title: title2,
-            description: description2,
-            gradient: gradient2,
-          ),
-        ),
-      ],
+  String _getMonthAbbreviation(int month) {
+    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    return months[month - 1];
+  }
+
+  Widget _buildMeditationGrid() {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 20,
+        mainAxisSpacing: 20,
+        childAspectRatio: 0.8,
+      ),
+      itemCount: _filteredMeditations.length,
+      itemBuilder: (context, index) {
+        final meditation = _filteredMeditations[index];
+        return _buildMeditationCard(meditation);
+      },
     );
   }
 
-  Widget _buildMeditationCard({
-    required String title,
-    required String description,
-    required LinearGradient gradient,
-  }) {
+  Widget _buildMeditationCard(Meditation meditation) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => MeditationDetailScreen(
-              title: title,
-              description: description,
-              duration: '5-10 MIN',
+              title: meditation.title,
+              description: meditation.description,
+              duration: '${meditation.duration.inMinutes} MIN',
+              meditationId: meditation.id,
             ),
           ),
         );
+        
+        _analytics.logEvent('meditation_selected', parameters: {
+          'meditation_id': meditation.id,
+          'meditation_title': meditation.title,
+          'is_premium': meditation.isPremium,
+          'is_downloaded': meditation.isDownloaded,
+        });
       },
       child: Container(
-        height: 210,
         decoration: BoxDecoration(
-          gradient: gradient,
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFF67548B),
+              const Color(0xFFD3C265),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(
           children: [
+            // Gradient overlay for text readability
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
-                height: 90,
+                height: 80,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       Colors.black.withOpacity(0.0),
-                      Colors.black.withOpacity(0.2),
+                      Colors.black.withOpacity(0.5),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -344,27 +398,150 @@ class _MeditateScreenState extends State<MeditateScreen> {
                 ),
               ),
             ),
+            // Content
             Padding(
               padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  // Title
                   Text(
-                    title,
+                    meditation.title,
                     style: const TextStyle(
                       fontFamily: 'HelveticaNeue',
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
+                  // Duration
+                  Text(
+                    '${meditation.duration.inMinutes} MIN',
+                    style: const TextStyle(
+                      fontFamily: 'HelveticaNeue',
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                  ),
+                  // Status indicators
+                  Row(
+                    children: [
+                      if (meditation.isPremium)
+                        Container(
+                          margin: const EdgeInsets.only(top: 5, right: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Text(
+                            'PRO',
+                            style: TextStyle(
+                              fontFamily: 'HelveticaNeue',
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      if (meditation.isDownloaded)
+                        Container(
+                          margin: const EdgeInsets.only(top: 5),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.download_done, color: Colors.white, size: 10),
+                              SizedBox(width: 2),
+                              Text(
+                                'OFFLINE',
+                                style: TextStyle(
+                                  fontFamily: 'HelveticaNeue',
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search_off,
+            size: 80,
+            color: AppColors.primary.withOpacity(0.5),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'No meditations found',
+            style: TextStyle(
+              fontFamily: 'HelveticaNeue',
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            _selectedFilter == 'Downloaded'
+                ? 'You haven\'t downloaded any meditations yet'
+                : 'Try selecting a different filter',
+            style: const TextStyle(
+              fontFamily: 'HelveticaNeue',
+              fontSize: 14,
+              color: Color(0xFFA0A3B1),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 30),
+          if (_selectedFilter == 'Downloaded')
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _selectedFilter = 'All';
+                  _filterMeditations();
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              ),
+              child: const Text(
+                'Browse Meditations',
+                style: TextStyle(
+                  fontFamily: 'HelveticaNeue',
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -442,4 +619,4 @@ class _MeditateScreenState extends State<MeditateScreen> {
       ),
     );
   }
-} 
+}

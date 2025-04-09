@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signup_signin_screen.dart';
 import 'package:meditation_app/features/home/presentation/screens/home_screen.dart';
+import 'package:meditation_app/features/auth/domain/utils/auth_error_handler.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -68,36 +69,30 @@ class _SignInScreenState extends State<SignInScreen> with WidgetsBindingObserver
 
   Future<void> _signInWithEmailAndPassword() async {
     try {
-      final UserCredential userCredential = 
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
-      if (userCredential.user != null && mounted) {
-        // Add delay to allow proper widget disposal
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (!mounted) return;
-        
+      if (mounted) {
         Navigator.pushReplacementNamed(context, '/home');
       }
     } on FirebaseAuthException catch (e) {
-      // Improved error handling
-      String errorMessage = 'Sign-in failed. Please try again.';
-      if (e.code == 'user-not-found') {
-        errorMessage = 'No user found for that email.';
-      } else if (e.code == 'wrong-password') {
-        errorMessage = 'Wrong password provided.';
-      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
+          SnackBar(
+            content: Text(AuthErrorHandler.getErrorMessage(e)),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An unexpected error occurred: $e')),
+          SnackBar(
+            content: Text('An error occurred: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -329,7 +324,7 @@ class _SignInScreenState extends State<SignInScreen> with WidgetsBindingObserver
                           }
                         } on FirebaseAuthException catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Login failed: ${e.message}')),
+                            SnackBar(content: Text(AuthErrorHandler.getErrorMessage(e))),
                           );
                         } finally {
                           if (mounted) {

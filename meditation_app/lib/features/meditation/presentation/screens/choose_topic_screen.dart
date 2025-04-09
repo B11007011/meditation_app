@@ -125,7 +125,7 @@ class _ChooseTopicScreenState extends State<ChooseTopicScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => HomeScreen(
-                                  userName: 'Afsar', // You can replace this with actual user name
+                                  // userName: 'Afsar', // Removed parameter as HomeScreen no longer accepts it
                                 ),
                               ),
                             );

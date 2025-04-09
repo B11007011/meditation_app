@@ -10,6 +10,11 @@ import 'package:meditation_app/features/meditation/presentation/screens/meditate
 import 'package:meditation_app/features/music/presentation/screens/music_screen.dart';
 import 'package:meditation_app/features/sleep/presentation/screens/sleep_screen.dart';
 import 'package:meditation_app/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:meditation_app/features/profile/presentation/screens/notifications_screen.dart';
+import 'package:meditation_app/features/profile/presentation/screens/privacy_screen.dart';
+import 'package:meditation_app/features/profile/presentation/screens/help_support_screen.dart';
+import 'package:meditation_app/features/profile/presentation/screens/about_screen.dart';
+import 'package:meditation_app/features/premium/presentation/screens/premium_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -323,7 +328,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              // TODO: Implement membership upgrade
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PremiumScreen()),
+              );
             },
             style: ElevatedButton.styleFrom(
               foregroundColor: const Color(0xFF8E97FD),
@@ -348,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-    Widget _buildSettingsSection() {
+  Widget _buildSettingsSection() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
@@ -368,28 +376,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
             icon: Icons.notifications_outlined,
             title: 'Notifications',
             onTap: () {
-              // TODO: Implement notifications settings
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              );
             },
           ),
           _buildSettingsItem(
             icon: Icons.lock_outline,
             title: 'Privacy',
             onTap: () {
-              // TODO: Implement privacy settings
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PrivacyScreen()),
+              );
             },
           ),
           _buildSettingsItem(
             icon: Icons.help_outline,
             title: 'Help & Support',
             onTap: () {
-              // TODO: Implement help & support
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HelpSupportScreen()),
+              );
             },
           ),
           _buildSettingsItem(
             icon: Icons.info_outline,
             title: 'About',
             onTap: () {
-              // TODO: Implement about
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutScreen()),
+              );
             },
           ),
           _buildSettingsItem(

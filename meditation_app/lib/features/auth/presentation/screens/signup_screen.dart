@@ -6,6 +6,7 @@ import 'package:meditation_app/features/auth/presentation/screens/signin_screen.
 import 'package:meditation_app/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:meditation_app/features/meditation/presentation/screens/choose_topic_screen.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
+import 'package:meditation_app/features/auth/domain/utils/auth_error_handler.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -57,27 +58,62 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     }
   }
 
+  Future<void> _signUp() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+
+        // Update user profile with name
+        await userCredential.user?.updateDisplayName(_nameController.text.trim());
+        
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+            (route) => false,
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(AuthErrorHandler.getErrorMessage(e)),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('An error occurred: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  void _handleSignUp() {
-    if (_formKey.currentState!.validate() && _isPrivacyPolicyAccepted) {
-      setState(() => _isLoading = true);
-      
-      // TODO: Implement actual signup logic with backend
-      // For now, we'll just navigate to welcome screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ChooseTopicScreen(),
-        ),
-      );
-    }
   }
 
   @override
@@ -366,7 +402,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       width: double.infinity,
                       height: 63,
                       child: ElevatedButton(
-                        onPressed: _isLoading ? null : _handleSignUp,
+                        onPressed: _isLoading ? null : _signUp,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF8E97FD),
                           shape: RoundedRectangleBorder(
