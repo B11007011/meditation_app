@@ -39,7 +39,7 @@ class _MeditationDetailScreenState extends State<MeditationDetailScreen> {
   Future<void> _loadMeditation() async {
     if (widget.meditationId != null) {
       try {
-        final meditation = await _repository.getMeditationById(widget.meditationId!);
+        final meditation = _repository.getMeditationById(widget.meditationId!);
         setState(() {
           _meditation = meditation;
         });

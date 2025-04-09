@@ -8,7 +8,7 @@ class UserProfile {
   final String id;
   
   @HiveField(1)
-  final String name;
+  final String? name;
   
   @HiveField(2)
   final String? email;
@@ -24,15 +24,23 @@ class UserProfile {
   
   @HiveField(6)
   final Duration totalMeditationTime;
+  
+  @HiveField(7)
+  final int dayStreak;
+  
+  @HiveField(8)
+  final bool isPremium;
 
-  UserProfile({
+  const UserProfile({
     required this.id,
-    required this.name,
+    this.name,
     this.email,
     this.avatarUrl,
     this.lastMeditationDate,
     this.totalSessions = 0,
-    this.totalMeditationTime = Duration.zero,
+    this.totalMeditationTime = const Duration(),
+    this.dayStreak = 0,
+    this.isPremium = false,
   });
 
   UserProfile copyWith({
@@ -43,6 +51,8 @@ class UserProfile {
     DateTime? lastMeditationDate,
     int? totalSessions,
     Duration? totalMeditationTime,
+    int? dayStreak,
+    bool? isPremium,
   }) {
     return UserProfile(
       id: id ?? this.id,
@@ -52,6 +62,8 @@ class UserProfile {
       lastMeditationDate: lastMeditationDate ?? this.lastMeditationDate,
       totalSessions: totalSessions ?? this.totalSessions,
       totalMeditationTime: totalMeditationTime ?? this.totalMeditationTime,
+      dayStreak: dayStreak ?? this.dayStreak,
+      isPremium: isPremium ?? this.isPremium,
     );
   }
 }

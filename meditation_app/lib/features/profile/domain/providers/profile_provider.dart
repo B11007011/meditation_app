@@ -1,37 +1,79 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:meditation_app/features/profile/domain/models/user_profile.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileNotifier extends StateNotifier<UserProfile?> {
   final Box<UserProfile> _box;
 
-  ProfileNotifier(this._box) : super(_box.values.isEmpty ? null : _box.values.first);
+  ProfileNotifier(this._box) : super(null) {
+    _initializeProfile();
+  }
+
+  Future<void> _initializeProfile() async {
+    try {
+      // Try to get current profile from Hive
+      final profile = _box.get('current_user');
+      
+      if (profile != null) {
+        state = profile;
+      } else {
+        // If no profile exists, create one from Firebase user
+        final firebaseUser = FirebaseAuth.instance.currentUser;
+        if (firebaseUser != null) {
+          await updateProfile(
+            id: firebaseUser.uid,
+            name: firebaseUser.displayName,
+            email: firebaseUser.email,
+            avatarUrl: firebaseUser.photoURL,
+          );
+        }
+      }
+    } catch (e) {
+      print('Error initializing profile: $e');
+      // Don't update state if there's an error
+    }
+  }
 
   Future<void> updateProfile({
     required String id,
-    required String name,
+    String? name,
     String? email,
     String? avatarUrl,
     DateTime? lastMeditationDate,
     int totalSessions = 0,
-    Duration totalMeditationTime = Duration.zero,
+    Duration totalMeditationTime = const Duration(),
+    int dayStreak = 0,
+    bool isPremium = false,
   }) async {
-    final profile = UserProfile(
-      id: id,
-      name: name,
-      email: email,
-      avatarUrl: avatarUrl,
-      lastMeditationDate: lastMeditationDate,
-      totalSessions: totalSessions,
-      totalMeditationTime: totalMeditationTime,
-    );
-    await _box.put('current_user', profile);
-    state = profile;
+    try {
+      final profile = UserProfile(
+        id: id,
+        name: name ?? 'Anonymous',
+        email: email,
+        avatarUrl: avatarUrl,
+        lastMeditationDate: lastMeditationDate,
+        totalSessions: totalSessions,
+        totalMeditationTime: totalMeditationTime,
+        dayStreak: dayStreak,
+        isPremium: isPremium,
+      );
+      
+      await _box.put('current_user', profile);
+      state = profile;
+    } catch (e) {
+      print('Error updating profile: $e');
+      // Don't update state if there's an error
+    }
   }
 
   Future<void> clearProfile() async {
-    await _box.clear();
-    state = null;
+    try {
+      await _box.clear();
+      state = null;
+    } catch (e) {
+      print('Error clearing profile: $e');
+    }
   }
 
   Future<void> updateMeditationStats({
@@ -47,6 +89,8 @@ class ProfileNotifier extends StateNotifier<UserProfile?> {
         lastMeditationDate: DateTime.now(),
         totalSessions: current.totalSessions + 1,
         totalMeditationTime: current.totalMeditationTime + duration,
+        dayStreak: current.dayStreak,
+        isPremium: current.isPremium,
       );
     }
   }

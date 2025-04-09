@@ -5,7 +5,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signin_screen.dart';
 import 'package:meditation_app/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:meditation_app/features/meditation/presentation/screens/choose_topic_screen.dart';
-import 'package:meditation_app/shared/theme/app_theme.dart';
 import 'package:meditation_app/features/auth/domain/utils/auth_error_handler.dart';
 
 class CreateAccountScreen extends StatefulWidget {
