@@ -44,9 +44,13 @@ dependencies:
   path_provider: ^2.1.1
   firebase_core: ^2.15.1
   firebase_auth: ^4.9.1
+  firebase_storage: ^11.2.6
+  firebase_crashlytics: ^3.4.8
+  firebase_analytics: ^10.8.0
   google_sign_in: ^5.4.0
   flutter_facebook_auth: ^6.0.4
   package_info_plus: ^4.1.0
+  image_picker: ^1.0.4
 
 dev_dependencies:
   flutter_test:

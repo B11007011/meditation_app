@@ -111,12 +111,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: 2,
               ),
             ),
-            child: const Center(
-              child: Icon(
-                Icons.person,
-                size: 40,
-                color: AppColors.primary,
-              ),
+            child: ClipOval(
+              child: profile.avatarUrl != null
+                  ? Image.network(
+                      profile.avatarUrl!,
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                          Image.asset(
+                        'assets/images/logo.png',
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  : Image.asset(
+                      'assets/images/logo.png',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.contain,
+                    ),
             ),
           ),
           const SizedBox(width: 20),

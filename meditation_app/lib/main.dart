@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signup_signin_screen.dart';
 import 'package:meditation_app/features/profile/presentation/providers/profile_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -10,64 +13,82 @@ import 'package:meditation_app/features/meditation/domain/repositories/meditatio
 import 'package:meditation_app/features/meditation/domain/services/meditation_player_service.dart';
 import 'package:meditation_app/features/meditation/domain/models/meditation.dart';
 import 'package:meditation_app/firebase_options.dart';
+import 'package:meditation_app/shared/adapters/duration_adapter.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  
-  try {
-    // Initialize Firebase with default options
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+  await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
     
-    // Initialize Hive for local storage
-    await Hive.initFlutter();
-    Hive.registerAdapter(UserProfileAdapter());
-    Hive.registerAdapter(MeditationAdapter());
-    await Hive.openBox<UserProfile>('userProfiles');
-    
-    // Initialize repositories and services
-    final meditationRepository = MeditationRepository();
-    await meditationRepository.initialize();
-    
-    final meditationPlayerService = MeditationPlayerService();
-    await meditationPlayerService.initialize();
-    
-    runApp(const MyApp());
-  } catch (e) {
-    debugPrint('Initialization Error: $e');
-    // Add fallback UI for initialization errors
-    runApp(
-      MaterialApp(
-        title: 'Silent Moon',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: 'HelveticaNeue',
-        ),
-        home: Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 50, color: Colors.red),
-                const SizedBox(height: 20),
-                const Text('Failed to initialize the app.', style: TextStyle(fontSize: 18)),
-                const SizedBox(height: 10),
-                Text('Error: $e', style: const TextStyle(fontSize: 14, color: Colors.grey)),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => main(),
-                  child: const Text('Retry'),
-                ),
-              ],
+    try {
+      // Initialize Firebase with default options
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+
+      // Pass all uncaught errors to Crashlytics
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
+      
+      // Enable Crashlytics data collection
+      await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+
+      // Initialize Hive for local storage
+      await Hive.initFlutter();
+      
+      // Register adapters
+      Hive.registerAdapter(UserProfileAdapter());
+      Hive.registerAdapter(MeditationAdapter());
+      Hive.registerAdapter(DurationAdapter());
+      
+      // Open boxes
+      await Hive.openBox<UserProfile>('userProfiles');
+      
+      // Initialize repositories and services
+      final meditationRepository = MeditationRepository();
+      await meditationRepository.initialize();
+      
+      final meditationPlayerService = MeditationPlayerService();
+      await meditationPlayerService.initialize();
+      
+      runApp(const MyApp());
+    } catch (e, stack) {
+      debugPrint('Initialization Error: $e');
+      FirebaseCrashlytics.instance.recordError(e, stack);
+      // Add fallback UI for initialization errors
+      runApp(
+        MaterialApp(
+          title: 'Silent Moon',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            fontFamily: 'HelveticaNeue',
+          ),
+          home: Scaffold(
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 50, color: Colors.red),
+                  const SizedBox(height: 20),
+                  const Text('Failed to initialize the app.', style: TextStyle(fontSize: 18)),
+                  const SizedBox(height: 10),
+                  Text('Error: $e', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () => main(),
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      );
+    }
+  }, (error, stack) {
+    // Handle any errors that occur in the zone
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+  });
 }
 
 class MyApp extends StatelessWidget {
