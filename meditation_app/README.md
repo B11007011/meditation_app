@@ -79,6 +79,7 @@ The test suite includes:
 
 flutter pub run build_runner build --delete-conflicting-outputs
 
+ flutter run -d macos 
 
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.

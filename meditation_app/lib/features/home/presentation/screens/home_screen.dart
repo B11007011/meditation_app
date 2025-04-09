@@ -95,7 +95,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Good Morning${userProfile?.name != null ? ", ${userProfile.name!.split(" ")[0]}" : ""}',
+                userProfile?.name != null && userProfile!.name!.isNotEmpty
+                    ? 'Good Morning, ${userProfile.name!.split(" ")[0]}'
+                    : 'Good Morning',
                 style: const TextStyle(
                   fontFamily: 'HelveticaNeue',
                   fontSize: 28,
