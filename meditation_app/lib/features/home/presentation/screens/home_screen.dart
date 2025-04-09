@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 import 'package:meditation_app/features/meditation/presentation/screens/meditate_screen.dart';
 import 'package:meditation_app/features/music/presentation/screens/music_screen.dart';
@@ -8,6 +9,7 @@ import 'package:meditation_app/features/meditation/presentation/screens/meditati
 import 'package:meditation_app/features/meditation/domain/repositories/meditation_repository.dart';
 import 'package:meditation_app/features/meditation/domain/models/meditation.dart';
 import 'package:meditation_app/shared/services/analytics_service.dart';
+import 'package:meditation_app/features/profile/presentation/providers/profile_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -83,49 +85,84 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<ProfileProvider>(
+      builder: (context, profileProvider, _) {
+        final userProfile = profileProvider.userProfile;
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Good Morning',
-                style: TextStyle(
-                  fontFamily: 'HelveticaNeue',
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF3F414E),
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Good Morning${userProfile.name != null ? ", ${userProfile.name.split(" ")[0]}" : ""}',
+                    style: const TextStyle(
+                      fontFamily: 'HelveticaNeue',
+                      fontSize: 28,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF3F414E),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'We wish you have a good day',
+                    style: TextStyle(
+                      fontFamily: 'HelveticaNeue',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w300,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 5),
-              Text(
-                'We wish you have a good day',
-                style: TextStyle(
-                  fontFamily: 'HelveticaNeue',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.grey[600],
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
+                },
+                child: Container(
+                  width: 55,
+                  height: 55,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.2),
+                      width: 2,
+                    ),
+                  ),
+                  child: ClipOval(
+                    child: userProfile.avatarUrl != null
+                        ? Image.network(
+                            userProfile.avatarUrl!,
+                            width: 55,
+                            height: 55,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Image.asset(
+                              'assets/images/logo.png',
+                              width: 55,
+                              height: 55,
+                              fit: BoxFit.contain,
+                            ),
+                          )
+                        : Image.asset(
+                            'assets/images/logo.png',
+                            width: 55,
+                            height: 55,
+                            fit: BoxFit.contain,
+                          ),
+                  ),
                 ),
               ),
             ],
           ),
-          Container(
-            width: 55,
-            height: 55,
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
-              shape: BoxShape.circle,
-              image: const DecorationImage(
-                image: AssetImage('assets/images/profile_placeholder.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
