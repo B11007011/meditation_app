@@ -21,34 +21,64 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _passwordController = TextEditingController();
   bool _isPrivacyPolicyAccepted = false;
   bool _isLoading = false;
+  // Create a single instance of GoogleSignIn to reuse
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: [
+      'email',
+      'https://www.googleapis.com/auth/userinfo.profile',
+    ],
+  );
 
   Future<UserCredential?> signInWithGoogle() async {
     setState(() => _isLoading = true);
     try {
+      // Force sign out before sign in to clear any cached/stale state
+      try {
+        await _googleSignIn.signOut();
+        debugPrint('Successfully signed out from Google');
+      } catch (e) {
+        debugPrint('Error signing out from Google: $e');
+        // Continue with sign-in process even if sign-out fails
+      }
+
       // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
       if (googleUser == null) {
+        // User canceled the sign-in flow
+        debugPrint('Google sign-in canceled by user');
         return null;
       }
 
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = 
-          await googleUser.authentication;
+      try {
+        // Obtain the auth details from the request
+        final GoogleSignInAuthentication googleAuth = 
+            await googleUser.authentication;
 
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+        // Create a new credential
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      // Once signed in, return the UserCredential
-      return await FirebaseAuth.instance.signInWithCredential(credential);
+        // Once signed in, return the UserCredential
+        return await FirebaseAuth.instance.signInWithCredential(credential);
+      } catch (authError) {
+        debugPrint('Google authentication error: $authError');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Authentication failed: ${authError.toString()}')),
+          );
+        }
+        return null;
+      }
     } catch (e) {
       debugPrint('Google sign in error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to sign in with Google: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to sign in with Google: ${e.toString()}')),
+        );
+      }
       return null;
     } finally {
       if (mounted) {
@@ -200,14 +230,23 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         onPressed: _isLoading 
                             ? null
                             : () async {
-                                final userCredential = await signInWithGoogle();
-                                if (userCredential != null && mounted) {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const ChooseTopicScreen(),
-                                    ),
-                                  );
+                                try {
+                                  final userCredential = await signInWithGoogle();
+                                  if (userCredential != null && mounted) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const ChooseTopicScreen(),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  debugPrint('Navigation error after Google sign-in: $e');
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Error: $e')),
+                                    );
+                                  }
                                 }
                               },
                         style: OutlinedButton.styleFrom(
@@ -216,33 +255,42 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             borderRadius: BorderRadius.circular(38),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: Stack(
+                        child: _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8E97FD)),
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SvgPicture.asset('assets/images/google_icon_1.svg'),
-                                  SvgPicture.asset('assets/images/google_icon_2.svg'),
-                                  SvgPicture.asset('assets/images/google_icon_3.svg'),
-                                  SvgPicture.asset('assets/images/google_icon_4.svg'),
+                                  SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: Stack(
+                                      children: [
+                                        SvgPicture.asset('assets/images/google_icon_1.svg'),
+                                        SvgPicture.asset('assets/images/google_icon_2.svg'),
+                                        SvgPicture.asset('assets/images/google_icon_3.svg'),
+                                        SvgPicture.asset('assets/images/google_icon_4.svg'),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  const Text(
+                                    'CONTINUE WITH GOOGLE',
+                                    style: TextStyle(
+                                      fontFamily: 'HelveticaNeue',
+                                      fontSize: 14,
+                                      letterSpacing: 0.7,
+                                      color: Color(0xFF3F414E),
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'CONTINUE WITH GOOGLE',
-                              style: TextStyle(
-                                fontFamily: 'HelveticaNeue',
-                                fontSize: 14,
-                                letterSpacing: 0.7,
-                                color: Color(0xFF3F414E),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ),
                     const SizedBox(height: 30),

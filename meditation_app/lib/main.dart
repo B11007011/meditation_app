@@ -12,6 +12,7 @@ import 'package:meditation_app/features/meditation/domain/services/meditation_pl
 import 'package:meditation_app/features/meditation/domain/models/meditation.dart';
 import 'package:meditation_app/firebase_options.dart';
 import 'package:meditation_app/shared/adapters/duration_adapter.dart';
+import 'package:meditation_app/shared/adapters/datetime_adapter.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -29,37 +30,74 @@ Future<void> initializeApp() async {
       // Enable Crashlytics data collection
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
     } catch (e) {
-      debugPrint('Firebase initialization error (continuing anyway): $e');
+      // More detailed logging for Firebase initialization errors
+      debugPrint('Firebase initialization error: $e');
+      // Check for common Firebase errors
+      if (e.toString().contains('package name') || e.toString().contains('applicationId')) {
+        debugPrint('Package name mismatch detected between app and Firebase config.');
+        debugPrint('Make sure google-services.json has the same package name as your build.gradle applicationId.');
+      }
       // Continue with the app even if Firebase fails to initialize
     }
 
-    // Initialize Hive for local storage
-    await Hive.initFlutter();
-    
-    // Clear adapter registry to avoid conflicts
-    Hive.resetAdapters();
-    
-    // Register adapters
-    Hive.registerAdapter(UserProfileAdapter());
-    Hive.registerAdapter(MeditationAdapter());
-    Hive.registerAdapter(DurationAdapter());
-    
-    // Open boxes - create a new box if it doesn't exist
+    // Initialize Hive for local storage - wrapped in try/catch for safety
     try {
-      await Hive.openBox<UserProfile>('user_profile');
+      await Hive.initFlutter();
+      
+      // Delete and recreate any existing Hive boxes to resolve compatibility issues
+      try {
+        await Hive.deleteBoxFromDisk('user_profile');
+        await Hive.deleteBoxFromDisk('meditations');
+      } catch (e) {
+        debugPrint('Error deleting Hive boxes: $e');
+      }
+      
+      // Clear adapter registry to avoid conflicts
+      try {
+        Hive.resetAdapters();
+      } catch (e) {
+        debugPrint('Error resetting Hive adapters: $e');
+      }
+      
+      // Register adapters with explicit typeIds
+      if (!Hive.isAdapterRegistered(3)) {
+        Hive.registerAdapter(UserProfileAdapter());
+      }
+      if (!Hive.isAdapterRegistered(5)) {
+        Hive.registerAdapter(MeditationAdapter());
+      }
+      if (!Hive.isAdapterRegistered(4)) {
+        Hive.registerAdapter(DurationAdapter());
+      }
+      if (!Hive.isAdapterRegistered(33)) {
+        Hive.registerAdapter(DateTimeAdapter());
+      }
+      
+      // Open boxes with better error handling
+      try {
+        await Hive.openBox<UserProfile>('user_profile');
+      } catch (e) {
+        debugPrint('Error opening user_profile box: $e');
+        // On error, try to recreate the box
+        await Hive.deleteBoxFromDisk('user_profile');
+        await Hive.openBox<UserProfile>('user_profile');
+      }
     } catch (e) {
-      debugPrint('Error opening Hive box: $e');
-      // Try to delete and recreate the box
-      await Hive.deleteBoxFromDisk('user_profile');
-      await Hive.openBox<UserProfile>('user_profile');
+      debugPrint('Hive initialization error: $e');
+      // Continue without Hive if necessary
     }
     
     // Initialize repositories and services
-    final meditationRepository = MeditationRepository();
-    await meditationRepository.initialize();
-    
-    final meditationPlayerService = MeditationPlayerService();
-    await meditationPlayerService.initialize();
+    try {
+      final meditationRepository = MeditationRepository();
+      await meditationRepository.initialize();
+      
+      final meditationPlayerService = MeditationPlayerService();
+      await meditationPlayerService.initialize();
+    } catch (e) {
+      debugPrint('Error initializing repositories/services: $e');
+      // Continue with initialization even if repositories have issues
+    }
   } catch (e) {
     debugPrint('Initialization Error: $e');
     rethrow;
@@ -67,11 +105,14 @@ Future<void> initializeApp() async {
 }
 
 void main() async {
-  // Ensure Flutter is initialized before doing anything else
-  WidgetsFlutterBinding.ensureInitialized();
+  // Set this flag to true to make zone errors fatal - catches zone mismatches
+  BindingBase.debugZoneErrorsAreFatal = true;
   
   runZonedGuarded(() async {
     try {
+      // Move ensureInitialized inside the zone to avoid zone mismatch
+      WidgetsFlutterBinding.ensureInitialized();
+      
       await initializeApp();
       runApp(const ProviderScope(child: MyApp()));
     } catch (e, stack) {
