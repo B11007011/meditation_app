@@ -18,19 +18,21 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
     };
     return UserProfile(
       id: fields[0] as String,
-      name: fields[1] as String,
+      name: fields[1] as String?,
       email: fields[2] as String?,
       avatarUrl: fields[3] as String?,
       lastMeditationDate: fields[4] as DateTime?,
       totalSessions: fields[5] as int,
       totalMeditationTime: fields[6] as Duration,
+      dayStreak: fields[7] as int,
+      isPremium: fields[8] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProfile obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +46,11 @@ class UserProfileAdapter extends TypeAdapter<UserProfile> {
       ..writeByte(5)
       ..write(obj.totalSessions)
       ..writeByte(6)
-      ..write(obj.totalMeditationTime);
+      ..write(obj.totalMeditationTime)
+      ..writeByte(7)
+      ..write(obj.dayStreak)
+      ..writeByte(8)
+      ..write(obj.isPremium);
   }
 
   @override

@@ -8,7 +8,7 @@ part of 'meditation.dart';
 
 class MeditationAdapter extends TypeAdapter<Meditation> {
   @override
-  final int typeId = 1;
+  final int typeId = 5;
 
   @override
   Meditation read(BinaryReader reader) {

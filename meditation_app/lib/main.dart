@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
-import 'package:meditation_app/features/auth/presentation/screens/signup_signin_screen.dart';
-import 'package:meditation_app/features/profile/presentation/providers/profile_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meditation_app/features/profile/domain/models/user_profile.dart';
 import 'package:meditation_app/features/splash/presentation/screens/splash_screen.dart';
@@ -17,12 +15,10 @@ import 'package:meditation_app/shared/adapters/duration_adapter.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() async {
-  await runZonedGuarded(() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    
+Future<void> initializeApp() async {
+  try {
+    // Initialize Firebase with default options
     try {
-      // Initialize Firebase with default options
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
@@ -32,26 +28,52 @@ void main() async {
       
       // Enable Crashlytics data collection
       await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    } catch (e) {
+      debugPrint('Firebase initialization error (continuing anyway): $e');
+      // Continue with the app even if Firebase fails to initialize
+    }
 
-      // Initialize Hive for local storage
-      await Hive.initFlutter();
-      
-      // Register adapters
-      Hive.registerAdapter(UserProfileAdapter());
-      Hive.registerAdapter(MeditationAdapter());
-      Hive.registerAdapter(DurationAdapter());
-      
-      // Open boxes
-      await Hive.openBox<UserProfile>('userProfiles');
-      
-      // Initialize repositories and services
-      final meditationRepository = MeditationRepository();
-      await meditationRepository.initialize();
-      
-      final meditationPlayerService = MeditationPlayerService();
-      await meditationPlayerService.initialize();
-      
-      runApp(const MyApp());
+    // Initialize Hive for local storage
+    await Hive.initFlutter();
+    
+    // Clear adapter registry to avoid conflicts
+    Hive.resetAdapters();
+    
+    // Register adapters
+    Hive.registerAdapter(UserProfileAdapter());
+    Hive.registerAdapter(MeditationAdapter());
+    Hive.registerAdapter(DurationAdapter());
+    
+    // Open boxes - create a new box if it doesn't exist
+    try {
+      await Hive.openBox<UserProfile>('user_profile');
+    } catch (e) {
+      debugPrint('Error opening Hive box: $e');
+      // Try to delete and recreate the box
+      await Hive.deleteBoxFromDisk('user_profile');
+      await Hive.openBox<UserProfile>('user_profile');
+    }
+    
+    // Initialize repositories and services
+    final meditationRepository = MeditationRepository();
+    await meditationRepository.initialize();
+    
+    final meditationPlayerService = MeditationPlayerService();
+    await meditationPlayerService.initialize();
+  } catch (e) {
+    debugPrint('Initialization Error: $e');
+    rethrow;
+  }
+}
+
+void main() async {
+  // Ensure Flutter is initialized before doing anything else
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  runZonedGuarded(() async {
+    try {
+      await initializeApp();
+      runApp(const ProviderScope(child: MyApp()));
     } catch (e, stack) {
       debugPrint('Initialization Error: $e');
       FirebaseCrashlytics.instance.recordError(e, stack);
@@ -91,27 +113,21 @@ void main() async {
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => ProfileProvider()),
-        ChangeNotifierProvider(create: (_) => MeditationPlayerService()),
-      ],
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        title: 'Silent Moon',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          fontFamily: 'HelveticaNeue',
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: const SplashScreen(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    return MaterialApp(
+      navigatorKey: navigatorKey,
+      title: 'Silent Moon',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        fontFamily: 'HelveticaNeue',
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      home: const SplashScreen(),
     );
   }
 }

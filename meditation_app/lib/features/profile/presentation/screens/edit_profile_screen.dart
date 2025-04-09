@@ -1,20 +1,20 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 import 'package:meditation_app/features/profile/domain/models/user_profile.dart';
-import 'package:meditation_app/features/profile/presentation/providers/profile_provider.dart';
+import 'package:meditation_app/shared/providers/shared_providers.dart';
 
-class EditProfileScreen extends StatefulWidget {
+class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -27,9 +27,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     // Load current profile data into text controllers
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profile = Provider.of<ProfileProvider>(context, listen: false).userProfile;
-      _nameController.text = profile.name;
-      _emailController.text = profile.email ?? '';
+      final profile = ref.read(profileProvider);
+      if (profile != null) {
+        _nameController.text = profile.name ?? '';
+        _emailController.text = profile.email ?? '';
+      }
     });
   }
 
@@ -85,15 +87,23 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
         
         // Update the profile
-        final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-        final currentProfile = profileProvider.userProfile;
-        final updatedProfile = currentProfile.copyWith(
-          name: _nameController.text,
-          email: _emailController.text,
-          avatarUrl: imageUrl ?? currentProfile.avatarUrl,
-        );
+        final currentProfile = ref.read(profileProvider);
         
-        profileProvider.updateProfile(updatedProfile);
+        if (currentProfile != null) {
+          final profileNotifier = ref.read(profileProvider.notifier);
+          await profileNotifier.updateProfile(
+            id: currentProfile.id,
+            name: _nameController.text,
+            email: _emailController.text,
+            avatarUrl: imageUrl ?? currentProfile.avatarUrl,
+            lastMeditationDate: currentProfile.lastMeditationDate,
+            totalSessions: currentProfile.totalSessions,
+            totalMeditationTime: currentProfile.totalMeditationTime,
+            dayStreak: currentProfile.dayStreak,
+            isPremium: currentProfile.isPremium,
+          );
+        }
+        
         if (mounted) {
           Navigator.pop(context);
         }
@@ -111,7 +121,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final profile = Provider.of<ProfileProvider>(context).userProfile;
+    final profile = ref.watch(profileProvider);
+    
+    if (profile == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
     
     return Scaffold(
       backgroundColor: Colors.white,

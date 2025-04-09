@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signup_signin_screen.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 import 'package:meditation_app/features/profile/domain/models/user_profile.dart';
-import 'package:meditation_app/features/profile/presentation/providers/profile_provider.dart';
+import 'package:meditation_app/shared/providers/shared_providers.dart';
 import 'package:meditation_app/features/home/presentation/screens/home_screen.dart';
 import 'package:meditation_app/features/meditation/presentation/screens/meditate_screen.dart';
 import 'package:meditation_app/features/music/presentation/screens/music_screen.dart';
@@ -16,62 +16,67 @@ import 'package:meditation_app/features/profile/presentation/screens/help_suppor
 import 'package:meditation_app/features/profile/presentation/screens/about_screen.dart';
 import 'package:meditation_app/features/premium/presentation/screens/premium_screen.dart';
 
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // Add delayed initialization to ensure provider mounted
-    Future.microtask(() {
-      if (mounted) {
-        // Profile is now auto-initialized by ProfileProvider
-      }
-    });
-  }
-
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<ProfileProvider>(
-      builder: (context, provider, child) {
-        // Add error boundary
-        if (provider.userProfile.id == 'unknown') {
-          return const Center(child: Text('User not authenticated'));
-        }
-        // Rest of profile UI
-        return ChangeNotifierProvider(
-          create: (_) => ProfileProvider(),
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Consumer<ProfileProvider>(
-                builder: (context, profileProvider, _) {
-                  final UserProfile userProfile = profileProvider.userProfile;
-                  
-                  return SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildHeader(),
-                        _buildProfileCard(userProfile),
-                        _buildStatisticsSection(userProfile),
-                        _buildMembershipSection(userProfile),
-                        _buildSettingsSection(),
-                      ],
-                    ),
-                  );
-                },
+    final userProfile = ref.watch(profileProvider);
+    
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: userProfile == null
+          ? _buildLoadingView()
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(),
+                  _buildProfileCard(userProfile),
+                  _buildStatisticsSection(userProfile),
+                  _buildMembershipSection(userProfile),
+                  _buildSettingsSection(),
+                ],
               ),
             ),
-            bottomNavigationBar: _buildBottomNavigationBar(),
-          ),
-        );
-      },
+      ),
+      bottomNavigationBar: _buildBottomNavigationBar(),
+    );
+  }
+
+  Widget _buildLoadingView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            Text(
+              'Loading profile...',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 32),
+            TextButton(
+              onPressed: () {
+                // Force refresh of the profile provider
+                ref.refresh(profileProvider);
+              },
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

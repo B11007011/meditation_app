@@ -19,19 +19,50 @@ class ProfileNotifier extends StateNotifier<UserProfile?> {
         state = profile;
       } else {
         // If no profile exists, create one from Firebase user
-        final firebaseUser = FirebaseAuth.instance.currentUser;
-        if (firebaseUser != null) {
-          await updateProfile(
-            id: firebaseUser.uid,
-            name: firebaseUser.displayName,
-            email: firebaseUser.email,
-            avatarUrl: firebaseUser.photoURL,
-          );
+        try {
+          final firebaseUser = FirebaseAuth.instance.currentUser;
+          if (firebaseUser != null) {
+            await updateProfile(
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName,
+              email: firebaseUser.email,
+              avatarUrl: firebaseUser.photoURL,
+            );
+            return; // Successfully created profile from Firebase
+          }
+        } catch (e) {
+          print('Error accessing Firebase user: $e');
+          // Continue to create a default user
         }
+        
+        // Create a default profile for demo purposes if no Firebase user or error occurred
+        await updateProfile(
+          id: 'demo_user',
+          name: 'Demo User',
+          email: 'demo@example.com',
+        );
       }
     } catch (e) {
       print('Error initializing profile: $e');
-      // Don't update state if there's an error
+      
+      // Create a minimal fallback profile if all else fails
+      try {
+        final fallbackProfile = UserProfile(
+          id: 'fallback_user',
+          name: 'Guest User',
+          email: null,
+          avatarUrl: null,
+          lastMeditationDate: null,
+          totalSessions: 0,
+          totalMeditationTime: const Duration(),
+          dayStreak: 0,
+          isPremium: false,
+        );
+        
+        state = fallbackProfile;
+      } catch (innerError) {
+        print('Failed to create fallback profile: $innerError');
+      }
     }
   }
 
@@ -95,8 +126,3 @@ class ProfileNotifier extends StateNotifier<UserProfile?> {
     }
   }
 }
-
-final profileProvider = StateNotifierProvider<ProfileNotifier, UserProfile?>((ref) {
-  final box = Hive.box<UserProfile>('user_profile');
-  return ProfileNotifier(box);
-});

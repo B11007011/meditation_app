@@ -19,11 +19,8 @@ class MeditationRepository {
   Future<void> initialize() async {
     if (!_isInitialized) {
       try {
-        // Make sure Hive is registered
-        if (!Hive.isAdapterRegistered(0)) { // Use a unique ID for your adapter
-          Hive.registerAdapter(MeditationAdapter());
-        }
-        
+        // No need to register the adapter here as it's already registered in main.dart
+        // Just open the box
         _meditationsBox = await Hive.openBox<Meditation>('meditations');
         _isInitialized = true;
         

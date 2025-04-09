@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'meditation.g.dart';
 
-@HiveType(typeId: 1)
+@HiveType(typeId: 5)
 class Meditation {
   @HiveField(0)
   final String id;

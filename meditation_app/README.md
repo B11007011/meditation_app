@@ -76,6 +76,10 @@ The test suite includes:
 - [ ] Prepare app store screenshots and descriptions
 - [ ] Set up in-app purchases for premium content
 
+
+flutter pub run build_runner build --delete-conflicting-outputs
+
+
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
