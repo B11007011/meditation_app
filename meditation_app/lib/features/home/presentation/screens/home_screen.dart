@@ -91,32 +91,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                userProfile?.name != null && userProfile!.name!.isNotEmpty
-                    ? 'Good Morning, ${userProfile.name!.split(" ")[0]}'
-                    : 'Good Morning',
-                style: const TextStyle(
-                  fontFamily: 'HelveticaNeue',
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFF3F414E),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  userProfile?.name != null && userProfile!.name!.isNotEmpty
+                      ? 'Good Morning, ${userProfile.name!.split(" ")[0]}'
+                      : 'Good Morning',
+                  style: const TextStyle(
+                    fontFamily: 'HelveticaNeue',
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF3F414E),
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'We wish you have a good day',
-                style: TextStyle(
-                  fontFamily: 'HelveticaNeue',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: Colors.grey[600],
+                const SizedBox(height: 5),
+                Text(
+                  'We wish you have a good day',
+                  style: TextStyle(
+                    fontFamily: 'HelveticaNeue',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.grey[600],
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 10),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -570,10 +577,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       fontSize: 14,
                       color: Colors.grey[600],
                     ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 5),
             if (meditation.isDownloaded)
               const Icon(
                 Icons.download_done,
@@ -637,25 +647,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'HelveticaNeue',
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+      child: SizedBox(
+        width: 70, // Fixed width for each navigation item
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
               color: color,
+              size: 24,
             ),
-          ),
-        ],
+            const SizedBox(height: 5),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'HelveticaNeue',
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                color: color,
+              ),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

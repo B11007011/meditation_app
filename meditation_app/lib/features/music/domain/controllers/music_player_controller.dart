@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart' as audio;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/features/music/domain/models/music_track.dart';
 import 'package:meditation_app/features/music/domain/repositories/music_repository.dart';
+import 'package:meditation_app/features/music/domain/repositories/music_repository_impl.dart';
 
 enum PlayerState {
   stopped,
@@ -61,7 +62,7 @@ final musicPlayerControllerProvider =
 });
 
 final musicRepositoryProvider = Provider<MusicRepository>((ref) {
-  throw UnimplementedError('Provider was not initialized');
+  return MusicRepositoryImpl();
 });
 
 class MusicPlayerController extends StateNotifier<MusicPlayerState> {

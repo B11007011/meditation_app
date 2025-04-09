@@ -242,10 +242,10 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                       offset: const Offset(0, 10),
                     ),
                   ],
-                  image: DecorationImage(
-                    image: AssetImage(widget.meditation.imageUrl),
-                    fit: BoxFit.cover,
-                  ),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(125),
+                  child: _buildMeditationImage(widget.meditation.imageUrl),
                 ),
               ),
               const SizedBox(height: 40),
@@ -442,5 +442,45 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
         );
       },
     );
+  }
+
+  Widget _buildMeditationImage(String imageUrl) {
+    try {
+      return Image.asset(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          // Fallback to a solid color with the first letter of the meditation title
+          return Container(
+            color: const Color(0xFF6B75CA),
+            child: Center(
+              child: Text(
+                widget.meditation.title.substring(0, 1).toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 80,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      // Fallback to a solid color with the first letter of the meditation title
+      return Container(
+        color: const Color(0xFF6B75CA),
+        child: Center(
+          child: Text(
+            widget.meditation.title.substring(0, 1).toUpperCase(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 80,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+    }
   }
 }
