@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meditation_app/shared/theme/app_theme.dart';
 import 'package:meditation_app/features/meditation/domain/models/reminder_settings.dart';
 import 'package:meditation_app/features/home/presentation/screens/home_screen.dart';
+import 'package:meditation_app/shared/providers/shared_providers.dart';
+import 'package:meditation_app/shared/services/notification_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ReminderScreen extends StatefulWidget {
+class ReminderScreen extends ConsumerStatefulWidget {
   const ReminderScreen({super.key});
 
   @override
-  State<ReminderScreen> createState() => _ReminderScreenState();
+  ConsumerState<ReminderScreen> createState() => _ReminderScreenState();
 }
 
-class _ReminderScreenState extends State<ReminderScreen> {
+class _ReminderScreenState extends ConsumerState<ReminderScreen> {
   // Time selection
   int selectedHour = 11;
   String selectedAmPm = "AM";
@@ -19,6 +23,41 @@ class _ReminderScreenState extends State<ReminderScreen> {
   // Day selection
   final Set<String> selectedDays = {"SU", "M", "T", "W", "S"};
   final List<String> weekdays = ["SU", "M", "T", "W", "TH", "F", "S"];
+  
+  // Loading state
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedSettings();
+  }
+  
+  Future<void> _loadSavedSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedHour = prefs.getInt('reminder_hour');
+    final savedMinute = prefs.getInt('reminder_minute');
+    final savedAmPm = prefs.getString('reminder_ampm');
+    final savedDays = prefs.getStringList('reminder_days');
+    
+    if (savedHour != null && savedMinute != null && savedAmPm != null && savedDays != null) {
+      setState(() {
+        selectedHour = savedHour;
+        selectedMinute = savedMinute;
+        selectedAmPm = savedAmPm;
+        selectedDays.clear();
+        selectedDays.addAll(savedDays);
+      });
+    }
+  }
+  
+  Future<void> _saveSettings(ReminderSettings settings) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('reminder_hour', settings.hour);
+    await prefs.setInt('reminder_minute', settings.minute);
+    await prefs.setString('reminder_ampm', settings.amPm);
+    await prefs.setStringList('reminder_days', settings.days);
+  }
 
   // Get current settings as a ReminderSettings object
   ReminderSettings get currentSettings => ReminderSettings(
@@ -248,26 +287,32 @@ class _ReminderScreenState extends State<ReminderScreen> {
               child: SizedBox(
                 height: 63,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Save the reminder settings and navigate
-                    Navigator.pop(context, currentSettings);
-                  },
+                  onPressed: _isLoading ? null : () => _saveAndSchedule(false),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF8E97FD),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(38),
                     ),
                   ),
-                  child: const Text(
-                    'SAVE',
-                    style: TextStyle(
-                      fontFamily: 'HelveticaNeue',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      letterSpacing: 0.7,
-                      color: Color(0xFFF6F1FB),
-                    ),
-                  ),
+                  child: _isLoading 
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text(
+                        'SAVE',
+                        style: TextStyle(
+                          fontFamily: 'HelveticaNeue',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          letterSpacing: 0.7,
+                          color: Color(0xFFF6F1FB),
+                        ),
+                      ),
                 ),
               ),
             ),
@@ -276,31 +321,32 @@ class _ReminderScreenState extends State<ReminderScreen> {
               child: SizedBox(
                 height: 63,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // Skip to home screen with current settings
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomeScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: _isLoading ? null : () => _saveAndSchedule(true),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFDB9D),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(38),
                     ),
                   ),
-                  child: const Text(
-                    'SAVE & CONTINUE',
-                    style: TextStyle(
-                      fontFamily: 'HelveticaNeue',
-                      fontWeight: FontWeight.w400,
-                      fontSize: 14,
-                      letterSpacing: 0.7,
-                      color: Color(0xFF3F414E),
-                    ),
-                  ),
+                  child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Color(0xFF3F414E),
+                        ),
+                      )
+                    : const Text(
+                        'SAVE & CONTINUE',
+                        style: TextStyle(
+                          fontFamily: 'HelveticaNeue',
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14,
+                          letterSpacing: 0.7,
+                          color: Color(0xFF3F414E),
+                        ),
+                      ),
                 ),
               ),
             ),
@@ -308,7 +354,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
         ),
         const SizedBox(height: 20),
         TextButton(
-          onPressed: () {
+          onPressed: _isLoading ? null : () {
             Navigator.pop(context);
           },
           child: const Text(
@@ -324,5 +370,52 @@ class _ReminderScreenState extends State<ReminderScreen> {
         ),
       ],
     );
+  }
+  
+  Future<void> _saveAndSchedule(bool shouldNavigate) async {
+    if (selectedDays.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select at least one day')),
+      );
+      return;
+    }
+    
+    setState(() {
+      _isLoading = true;
+    });
+    
+    try {
+      final settings = currentSettings;
+      
+      // Save settings to SharedPreferences
+      await _saveSettings(settings);
+      
+      // Schedule notifications
+      final notificationService = ref.read(notificationServiceProvider);
+      await notificationService.scheduleMeditationReminder(settings);
+      
+      if (mounted) {
+        if (shouldNavigate) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        } else {
+          Navigator.pop(context, settings);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error scheduling reminder: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 } 

@@ -97,7 +97,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
               height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.3),
+                color: Color.fromRGBO(255, 255, 255, 0.3),
               ),
               child: const Icon(
                 Icons.arrow_back,
@@ -120,7 +120,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
             height: 40,
             width: 40,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Color.fromRGBO(255, 255, 255, 0.3),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -149,7 +149,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Color.fromRGBO(0, 0, 0, 0.1),
                 blurRadius: 20,
                 spreadRadius: 0,
                 offset: const Offset(0, 10),
@@ -166,7 +166,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
                   return CustomPaint(
                     painter: MusicVisualizerPainter(
                       progress: _animationController.value,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Color.fromRGBO(255, 255, 255, 0.5),
                     ),
                     size: const Size(180, 180),
                   );
@@ -176,7 +176,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
                 width: 70,
                 height: 70,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Color.fromRGBO(255, 255, 255, 0.3),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -226,7 +226,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
             data: SliderThemeData(
               trackHeight: 3,
               activeTrackColor: Colors.white,
-              inactiveTrackColor: Colors.white.withOpacity(0.3),
+              inactiveTrackColor: Color.fromRGBO(255, 255, 255, 0.3),
               thumbColor: Colors.white,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
               overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
@@ -284,7 +284,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
               data: SliderThemeData(
                 trackHeight: 3,
                 activeTrackColor: Colors.white,
-                inactiveTrackColor: Colors.white.withOpacity(0.3),
+                inactiveTrackColor: Color.fromRGBO(255, 255, 255, 0.3),
                 thumbColor: Colors.white,
                 thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
                 overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
@@ -321,7 +321,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.3),
+              color: Color.fromRGBO(255, 255, 255, 0.3),
             ),
             child: const Icon(
               Icons.replay_10,
@@ -350,7 +350,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Color.fromRGBO(0, 0, 0, 0.1),
                     blurRadius: 20,
                     spreadRadius: 0,
                     offset: const Offset(0, 5),
@@ -371,7 +371,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> with SingleTicker
             height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.3),
+              color: Color.fromRGBO(255, 255, 255, 0.3),
             ),
             child: const Icon(
               Icons.forward_10,

@@ -10,9 +10,13 @@ import 'package:meditation_app/features/splash/presentation/screens/splash_scree
 import 'package:meditation_app/features/meditation/domain/repositories/meditation_repository.dart';
 import 'package:meditation_app/features/meditation/domain/services/meditation_player_service.dart';
 import 'package:meditation_app/features/meditation/domain/models/meditation.dart';
+import 'package:meditation_app/features/sleep/domain/models/sleep_story.dart';
+import 'package:meditation_app/features/sleep/domain/repositories/sleep_repository.dart';
+import 'package:meditation_app/features/sleep/domain/services/sleep_player_service.dart';
 import 'package:meditation_app/firebase_options.dart';
 import 'package:meditation_app/shared/adapters/duration_adapter.dart';
 import 'package:meditation_app/shared/adapters/datetime_adapter.dart';
+import 'package:meditation_app/shared/services/notification_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -48,6 +52,7 @@ Future<void> initializeApp() async {
       try {
         await Hive.deleteBoxFromDisk('user_profile');
         await Hive.deleteBoxFromDisk('meditations');
+        await Hive.deleteBoxFromDisk('sleep_stories');
       } catch (e) {
         debugPrint('Error deleting Hive boxes: $e');
       }
@@ -72,6 +77,9 @@ Future<void> initializeApp() async {
       if (!Hive.isAdapterRegistered(33)) {
         Hive.registerAdapter(DateTimeAdapter());
       }
+      if (!Hive.isAdapterRegistered(6)) {
+        Hive.registerAdapter(SleepStoryAdapter());
+      }
       
       // Open boxes with better error handling
       try {
@@ -94,6 +102,17 @@ Future<void> initializeApp() async {
       
       final meditationPlayerService = MeditationPlayerService();
       await meditationPlayerService.initialize();
+      
+      // Initialize sleep repository and player
+      final sleepRepository = SleepRepository();
+      await sleepRepository.initialize();
+      
+      final sleepPlayerService = SleepPlayerService();
+      await sleepPlayerService.initialize();
+      
+      // Initialize notification service
+      final notificationService = NotificationService();
+      await notificationService.initialize();
     } catch (e) {
       debugPrint('Error initializing repositories/services: $e');
       // Continue with initialization even if repositories have issues

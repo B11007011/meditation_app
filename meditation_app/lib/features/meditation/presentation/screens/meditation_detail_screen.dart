@@ -162,8 +162,8 @@ class _MeditationDetailScreenState extends State<MeditationDetailScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.1),
-                        Colors.black.withOpacity(0.5),
+                        Color.fromRGBO(0, 0, 0, 0.1),
+                        Color.fromRGBO(0, 0, 0, 0.5),
                       ],
                     ),
                   ),
@@ -221,7 +221,7 @@ class _MeditationDetailScreenState extends State<MeditationDetailScreen> {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary.withOpacity(0.1),
+                                    color: Color.fromRGBO(142, 151, 253, 0.1),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -241,7 +241,7 @@ class _MeditationDetailScreenState extends State<MeditationDetailScreen> {
                                     vertical: 5,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary.withOpacity(0.1),
+                                    color: Color.fromRGBO(142, 151, 253, 0.1),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -262,7 +262,7 @@ class _MeditationDetailScreenState extends State<MeditationDetailScreen> {
                                       vertical: 5,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: Colors.amber.withOpacity(0.2),
+                                      color: Color.fromRGBO(255, 193, 7, 0.2),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: const Text(
@@ -313,7 +313,7 @@ class _MeditationDetailScreenState extends State<MeditationDetailScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: 25,
-                                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                                  backgroundColor: Color.fromRGBO(142, 151, 253, 0.1),
                                   child: Text(
                                     _meditation!.narrator.substring(0, 1),
                                     style: TextStyle(

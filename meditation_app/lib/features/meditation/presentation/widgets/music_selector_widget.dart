@@ -55,7 +55,7 @@ class MusicSelectorWidget extends ConsumerWidget {
                 value: volume,
                 onChanged: onVolumeChanged,
                 activeColor: Colors.white,
-                inactiveColor: Colors.white.withOpacity(0.3),
+                inactiveColor: Color.fromRGBO(255, 255, 255, 0.3),
               ),
             ),
             IconButton(

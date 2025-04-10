@@ -212,7 +212,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
               margin: const EdgeInsets.only(bottom: 15),
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.white,
+                color: isSelected ? Color.fromRGBO(142, 151, 253, 0.1) : Colors.white,
                 border: Border.all(
                   color: isSelected ? AppColors.primary : const Color(0xFFE5E5E5),
                   width: 2,
@@ -356,7 +356,7 @@ class _PremiumScreenState extends State<PremiumScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

@@ -207,7 +207,7 @@ class _AboutScreenState extends State<AboutScreen> {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: Color.fromRGBO(142, 151, 253, 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(

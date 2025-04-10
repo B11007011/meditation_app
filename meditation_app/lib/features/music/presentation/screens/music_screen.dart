@@ -255,7 +255,7 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
                         height: 40,
                         width: 120,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
@@ -286,7 +286,7 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
                   width: 100,
                   height: 100,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
+                    color: Color.fromRGBO(255, 255, 255, 0.3),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -376,8 +376,8 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.0),
-                      Colors.black.withOpacity(0.2),
+                      Color.fromRGBO(0, 0, 0, 0.0),
+                      Color.fromRGBO(0, 0, 0, 0.2),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -420,7 +420,7 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Color.fromRGBO(255, 255, 255, 0.3),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -462,7 +462,7 @@ class _MusicScreenState extends State<MusicScreen> with SingleTickerProviderStat
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

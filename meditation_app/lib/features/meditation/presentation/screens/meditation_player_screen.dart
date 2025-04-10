@@ -164,7 +164,7 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                 end: Alignment.bottomCenter,
                 colors: [
                   const Color(0xFF8E97FD),
-                  const Color(0xFF6B75CA).withOpacity(0.8),
+                  Color.fromRGBO(107, 117, 202, 0.8),
                 ],
               ),
             ),
@@ -237,15 +237,15 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                   borderRadius: BorderRadius.circular(125),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: Color.fromRGBO(0, 0, 0, 0.2),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
                   ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(125),
-                  child: _buildMeditationImage(widget.meditation.imageUrl),
+                  image: DecorationImage(
+                    image: AssetImage(widget.meditation.imageUrl),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               const SizedBox(height: 40),
@@ -264,7 +264,7 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
               Text(
                 'Narrated by ${widget.meditation.narrator}',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
+                  color: Color.fromRGBO(255, 255, 255, 0.8),
                   fontSize: 16,
                 ),
                 textAlign: TextAlign.center,
@@ -279,9 +279,9 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                       thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
                       overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
                       activeTrackColor: Colors.white,
-                      inactiveTrackColor: Colors.white.withOpacity(0.3),
+                      inactiveTrackColor: Color.fromRGBO(255, 255, 255, 0.3),
                       thumbColor: Colors.white,
-                      overlayColor: Colors.white.withOpacity(0.2),
+                      overlayColor: Color.fromRGBO(255, 255, 255, 0.2),
                     ),
                     child: Slider(
                       value: position.inMilliseconds.toDouble(),
@@ -302,7 +302,7 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                         Text(
                           _formatDuration(position),
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Color.fromRGBO(255, 255, 255, 0.8),
                             fontSize: 12,
                           ),
                         ),
@@ -311,7 +311,7 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                               ? duration
                               : widget.meditation.duration),
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Color.fromRGBO(255, 255, 255, 0.8),
                             fontSize: 12,
                           ),
                         ),
@@ -332,9 +332,9 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
                         overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
                         activeTrackColor: Colors.white,
-                        inactiveTrackColor: Colors.white.withOpacity(0.3),
+                        inactiveTrackColor: Color.fromRGBO(255, 255, 255, 0.3),
                         thumbColor: Colors.white,
-                        overlayColor: Colors.white.withOpacity(0.2),
+                        overlayColor: Color.fromRGBO(255, 255, 255, 0.2),
                       ),
                       child: Slider(
                         value: _volume,
@@ -402,7 +402,7 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
                   borderRadius: BorderRadius.circular(40),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Color.fromRGBO(0, 0, 0, 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
@@ -442,45 +442,5 @@ class _MeditationPlayerScreenState extends ConsumerState<MeditationPlayerScreen>
         );
       },
     );
-  }
-
-  Widget _buildMeditationImage(String imageUrl) {
-    try {
-      return Image.asset(
-        imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          // Fallback to a solid color with the first letter of the meditation title
-          return Container(
-            color: const Color(0xFF6B75CA),
-            child: Center(
-              child: Text(
-                widget.meditation.title.substring(0, 1).toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 80,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      // Fallback to a solid color with the first letter of the meditation title
-      return Container(
-        color: const Color(0xFF6B75CA),
-        child: Center(
-          child: Text(
-            widget.meditation.title.substring(0, 1).toUpperCase(),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 80,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
-    }
   }
 }

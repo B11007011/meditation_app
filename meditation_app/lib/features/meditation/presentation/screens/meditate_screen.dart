@@ -365,8 +365,8 @@ class _MeditateScreenState extends State<MeditateScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              const Color(0xFF67548B),
-              const Color(0xFFD3C265),
+              Color.fromRGBO(142, 151, 253, 0.5),
+              Color.fromRGBO(211, 194, 101, 0.5),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -385,8 +385,8 @@ class _MeditateScreenState extends State<MeditateScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.0),
-                      Colors.black.withOpacity(0.5),
+                      Color.fromRGBO(0, 0, 0, 0.0),
+                      Color.fromRGBO(0, 0, 0, 0.5),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -435,7 +435,7 @@ class _MeditateScreenState extends State<MeditateScreen> {
                           margin: const EdgeInsets.only(top: 5, right: 5),
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.amber.withOpacity(0.7),
+                            color: Color.fromRGBO(255, 193, 7, 0.7),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Text(
@@ -453,7 +453,7 @@ class _MeditateScreenState extends State<MeditateScreen> {
                           margin: const EdgeInsets.only(top: 5),
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.7),
+                            color: Color.fromRGBO(0, 128, 0, 0.7),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: const Row(
@@ -492,7 +492,7 @@ class _MeditateScreenState extends State<MeditateScreen> {
           Icon(
             Icons.search_off,
             size: 80,
-            color: AppColors.primary.withOpacity(0.5),
+            color: Color.fromRGBO(142, 151, 253, 0.5),
           ),
           const SizedBox(height: 20),
           Text(
@@ -553,7 +553,7 @@ class _MeditateScreenState extends State<MeditateScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

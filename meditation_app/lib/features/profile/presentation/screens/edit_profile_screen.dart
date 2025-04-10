@@ -168,7 +168,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           height: 100,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary.withOpacity(0.2),
+                            color: Color.fromRGBO(142, 151, 253, 0.2),
                             border: Border.all(
                               color: AppColors.primary,
                               width: 2,
@@ -229,7 +229,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           Positioned.fill(
                             child: Container(
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Color.fromRGBO(255, 255, 255, 0.7),
                                 shape: BoxShape.circle,
                               ),
                               child: const Center(

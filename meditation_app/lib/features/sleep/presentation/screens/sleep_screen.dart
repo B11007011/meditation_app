@@ -56,7 +56,7 @@ class _SleepScreenState extends State<SleepScreen> {
           _buildHeader(),
           Container(
             height: 1,
-            color: const Color(0xFFE6E6E6).withOpacity(0.1),
+            color: const Color(0xFFE6E6E6).withAlpha(25),
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           ),
           Expanded(
@@ -80,7 +80,7 @@ class _SleepScreenState extends State<SleepScreen> {
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
+                color: Color.fromRGBO(255, 255, 255, 0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: SvgPicture.asset(
@@ -145,7 +145,7 @@ class _SleepScreenState extends State<SleepScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF4C53B4).withOpacity(0.3),
+          color: Color.fromRGBO(76, 83, 180, 0.3),
           borderRadius: BorderRadius.circular(15),
         ),
         child: Column(
@@ -158,7 +158,7 @@ class _SleepScreenState extends State<SleepScreen> {
                   width: 60,
                   height: 60,
                   colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.8),
+                    Color.fromRGBO(255, 255, 255, 0.8),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -228,7 +228,7 @@ class _SleepScreenState extends State<SleepScreen> {
         color: const Color(0xFF03174D),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
+            color: Color.fromRGBO(0, 0, 0, 0.5),
             offset: const Offset(0, -5),
             blurRadius: 20,
           ),

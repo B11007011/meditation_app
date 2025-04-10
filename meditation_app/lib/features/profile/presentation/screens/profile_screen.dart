@@ -110,7 +110,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             height: 80,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.primary.withOpacity(0.2),
+              color: Color.fromRGBO(142, 151, 253, 0.2),
               border: Border.all(
                 color: AppColors.primary,
                 width: 2,
@@ -257,7 +257,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.3),
+        color: Color.fromRGBO(255, 207, 134, 0.3),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -321,7 +321,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Color.fromRGBO(255, 255, 255, 0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: const Text(
@@ -509,7 +509,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),

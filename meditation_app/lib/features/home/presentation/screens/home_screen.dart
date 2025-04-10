@@ -91,39 +91,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  userProfile?.name != null && userProfile!.name!.isNotEmpty
-                      ? 'Good Morning, ${userProfile.name!.split(" ")[0]}'
-                      : 'Good Morning',
-                  style: const TextStyle(
-                    fontFamily: 'HelveticaNeue',
-                    fontSize: 28,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF3F414E),
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                userProfile?.name != null && userProfile!.name!.isNotEmpty
+                    ? 'Good Morning, ${userProfile.name!.split(" ")[0]}'
+                    : 'Good Morning',
+                style: const TextStyle(
+                  fontFamily: 'HelveticaNeue',
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF3F414E),
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  'We wish you have a good day',
-                  style: TextStyle(
-                    fontFamily: 'HelveticaNeue',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.grey[600],
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
+              ),
+              const SizedBox(height: 5),
+              Text(
+                'We wish you have a good day',
+                style: TextStyle(
+                  fontFamily: 'HelveticaNeue',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w300,
+                  color: Colors.grey[600],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -138,7 +131,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: Colors.grey[200],
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: Color.fromRGBO(142, 151, 253, 0.2),
                   width: 2,
                 ),
               ),
@@ -179,7 +172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         gradient: LinearGradient(
           colors: [
             AppColors.primary,
-            AppColors.primary.withOpacity(0.8),
+            Color.fromRGBO(142, 151, 253, 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -187,7 +180,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: Color.fromRGBO(142, 151, 253, 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -310,6 +303,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               fontSize: 16,
               color: Colors.grey,
             ),
+
           ),
         ),
       );
@@ -364,7 +358,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Color.fromRGBO(0, 0, 0, 0.1),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -382,8 +376,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.black.withOpacity(0.0),
-                      Colors.black.withOpacity(0.6),
+                      Color.fromRGBO(0, 0, 0, 0.0),
+                      Color.fromRGBO(0, 0, 0, 0.6),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -407,7 +401,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.7),
+                        color: Color.fromRGBO(255, 193, 7, 0.7),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Text(
@@ -525,7 +519,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Color.fromRGBO(0, 0, 0, 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -539,7 +533,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.primary.withOpacity(0.7),
+                    Color.fromRGBO(142, 151, 253, 0.7),
                     AppColors.primary,
                   ],
                   begin: Alignment.topLeft,
@@ -577,13 +571,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       fontSize: 14,
                       color: Colors.grey[600],
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 5),
             if (meditation.isDownloaded)
               const Icon(
                 Icons.download_done,
@@ -603,7 +594,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Color.fromRGBO(0, 0, 0, 0.05),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -647,30 +638,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     return GestureDetector(
       onTap: onTap,
-      child: SizedBox(
-        width: 70, // Fixed width for each navigation item
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: color,
+            size: 24,
+          ),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontFamily: 'HelveticaNeue',
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
               color: color,
-              size: 24,
             ),
-            const SizedBox(height: 5),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'HelveticaNeue',
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
-                color: color,
-              ),
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

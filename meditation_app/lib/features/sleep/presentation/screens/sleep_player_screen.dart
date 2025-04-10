@@ -53,7 +53,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        const Color(0xFF03174C).withOpacity(0.8),
+                        const Color.fromRGBO(3, 23, 76, 0.8),
                         const Color(0xFF03174C),
                       ],
                     ),
@@ -159,7 +159,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF03174C).withOpacity(0.3),
+                color: const Color.fromRGBO(3, 23, 76, 0.3),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Padding(
@@ -182,7 +182,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
               fontFamily: 'HelveticaNeue',
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Colors.white.withOpacity(0.8),
+              color: const Color.fromRGBO(255, 255, 255, 0.8),
               letterSpacing: 1,
             ),
           ),
@@ -190,7 +190,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF03174C).withOpacity(0.3),
+              color: const Color.fromRGBO(3, 23, 76, 0.3),
               borderRadius: BorderRadius.circular(20),
             ),
             child: const Icon(
@@ -212,7 +212,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
           width: 260,
           height: 260,
           decoration: BoxDecoration(
-            color: const Color(0xFF4C53B4).withOpacity(0.2),
+            color: const Color.fromRGBO(76, 83, 180, 0.2),
             borderRadius: BorderRadius.circular(130),
           ),
           child: Stack(
@@ -254,7 +254,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
             fontFamily: 'HelveticaNeue',
             fontSize: 16,
             fontWeight: FontWeight.w300,
-            color: Colors.white.withOpacity(0.8),
+            color: const Color.fromRGBO(255, 255, 255, 0.8),
             letterSpacing: 0.5,
           ),
         ),
@@ -296,11 +296,11 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: const Color(0xFF8E97FD),
+              color: const Color.fromRGBO(142, 151, 253, 0.4),
               borderRadius: BorderRadius.circular(40),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF8E97FD).withOpacity(0.4),
+                  color: const Color.fromRGBO(142, 151, 253, 0.4),
                   blurRadius: 15,
                   offset: const Offset(0, 5),
                 ),
@@ -349,8 +349,8 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
       children: [
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
-            activeTrackColor: const Color(0xFF8E97FD),
-            inactiveTrackColor: Colors.white.withOpacity(0.2),
+            activeTrackColor: const Color.fromRGBO(142, 151, 253, 0.4),
+            inactiveTrackColor: const Color.fromRGBO(255, 255, 255, 0.2),
             thumbColor: Colors.white,
             trackHeight: 4.0,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
@@ -378,7 +378,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
                 style: TextStyle(
                   fontFamily: 'HelveticaNeue',
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.7),
+                  color: const Color.fromRGBO(255, 255, 255, 0.7),
                 ),
               ),
               Text(
@@ -386,7 +386,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
                 style: TextStyle(
                   fontFamily: 'HelveticaNeue',
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.7),
+                  color: const Color.fromRGBO(255, 255, 255, 0.7),
                 ),
               ),
             ],
@@ -411,8 +411,8 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
             Expanded(
               child: SliderTheme(
                 data: SliderTheme.of(context).copyWith(
-                  activeTrackColor: const Color(0xFF8E97FD),
-                  inactiveTrackColor: Colors.white.withOpacity(0.2),
+                  activeTrackColor: const Color.fromRGBO(142, 151, 253, 0.4),
+                  inactiveTrackColor: const Color.fromRGBO(255, 255, 255, 0.2),
                   thumbColor: Colors.white,
                   trackHeight: 4.0,
                   thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6.0),
@@ -462,7 +462,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
       decoration: BoxDecoration(
         color: isSelected 
             ? const Color(0xFF8E97FD) 
-            : Colors.white.withOpacity(0.1),
+            : const Color.fromRGBO(255, 255, 255, 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -473,7 +473,7 @@ class _SleepPlayerScreenState extends State<SleepPlayerScreen> {
           fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
           color: isSelected 
               ? Colors.white 
-              : Colors.white.withOpacity(0.7),
+              : const Color.fromRGBO(255, 255, 255, 0.7),
         ),
       ),
     );

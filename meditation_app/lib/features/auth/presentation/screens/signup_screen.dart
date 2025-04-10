@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:meditation_app/features/auth/presentation/screens/signin_screen.dart';
 import 'package:meditation_app/features/auth/presentation/screens/welcome_screen.dart';
 import 'package:meditation_app/features/meditation/presentation/screens/choose_topic_screen.dart';
@@ -33,6 +32,15 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   Future<UserCredential?> signInWithGoogle() async {
     setState(() => _isLoading = true);
     try {
+      // Force sign out before sign in to clear any cached/stale state
+      try {
+        await _googleSignIn.signOut();
+        debugPrint('Successfully signed out from Google');
+      } catch (e) {
+        debugPrint('Error signing out from Google: $e');
+        // Continue with sign-in process even if sign-out fails
+      }
+
       // Trigger the authentication flow
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
@@ -180,97 +188,37 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       width: double.infinity,
                       height: 63,
                       child: ElevatedButton(
-                        onPressed: _isLoading 
-                            ? null 
-                            : () async {
-                                setState(() => _isLoading = true);
-                                try {
-                                  final FacebookAuth facebookAuth = FacebookAuth.instance;
-                                  
-                                  // Attempt to log in with Facebook
-                                  final LoginResult result = await facebookAuth.login();
-                                  if (result.status == LoginStatus.success) {
-                                    // Get the access token
-                                    final AccessToken? accessToken = result.accessToken;
-                                    if (accessToken == null) {
-                                      throw Exception('Failed to get Facebook access token');
-                                    }
-                                    
-                                    // Create a credential
-                                    final OAuthCredential credential = 
-                                        FacebookAuthProvider.credential(accessToken.token);
-                                    
-                                    // Sign in with Firebase using the Facebook credential
-                                    final userCredential = 
-                                        await FirebaseAuth.instance.signInWithCredential(credential);
-                                    
-                                    if (mounted && userCredential.user != null) {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const ChooseTopicScreen(),
-                                        ),
-                                      );
-                                    }
-                                  } else {
-                                    // Handle failed or canceled login
-                                    if (mounted) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text('Facebook login failed: ${result.message}')),
-                                      );
-                                    }
-                                  }
-                                } catch (e) {
-                                  if (mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Facebook login error: $e')),
-                                    );
-                                  }
-                                } finally {
-                                  if (mounted) {
-                                    setState(() => _isLoading = false);
-                                  }
-                                }
-                              },
+                        onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF7583CA),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(38),
                           ),
                         ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                ),
-                              )
-                            : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/images/facebook_icon.svg',
-                                    width: 24,
-                                    height: 24,
-                                    colorFilter: const ColorFilter.mode(
-                                      Colors.white,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  const Text(
-                                    'CONTINUE WITH FACEBOOK',
-                                    style: TextStyle(
-                                      fontFamily: 'HelveticaNeue',
-                                      fontSize: 14,
-                                      letterSpacing: 0.7,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/images/facebook_icon.svg',
+                              width: 24,
+                              height: 24,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.white,
+                                BlendMode.srcIn,
                               ),
+                            ),
+                            const SizedBox(width: 10),
+                            const Text(
+                              'CONTINUE WITH FACEBOOK',
+                              style: TextStyle(
+                                fontFamily: 'HelveticaNeue',
+                                fontSize: 14,
+                                letterSpacing: 0.7,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),

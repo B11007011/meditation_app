@@ -117,45 +117,43 @@ class _ChooseTopicScreenState extends State<ChooseTopicScreen> {
                 width: double.infinity,
                 height: 63,
                 child: ElevatedButton(
-                  onPressed: selectedTopics.isNotEmpty 
-                      ? () async {
-                          if (reminderSettings != null) {
-                            // If we already have reminder settings, navigate to home screen
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => HomeScreen(
-                                  // userName: 'Afsar', // Removed parameter as HomeScreen no longer accepts it
-                                ),
+                  onPressed: selectedTopics.isNotEmpty
+                    ? () async {
+                      if (reminderSettings != null) {
+                        // Navigate to Home
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomeScreen(),
+                          ),
+                        );
+                      } else {
+                        // Navigate to the Reminder screen
+                        final result = await Navigator.push<ReminderSettings>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ReminderScreen(),
+                          ),
+                        );
+                        
+                        if (result != null) {
+                          setState(() {
+                            reminderSettings = result;
+                          });
+                          
+                          // Update status text
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Reminder set for ${result.formattedTime} on ${result.formattedDays}',
                               ),
-                            );
-                          } else {
-                            // Navigate to the Reminder screen
-                            final result = await Navigator.push<ReminderSettings>(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const ReminderScreen(),
-                              ),
-                            );
-                            
-                            if (result != null) {
-                              setState(() {
-                                reminderSettings = result;
-                              });
-                              
-                              // Show confirmation
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Reminder set for ${result.formattedTime} on ${result.formattedDays}',
-                                  ),
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          }
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
                         }
-                      : null,
+                      }
+                    }
+                    : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     disabledBackgroundColor: Colors.grey[300],
